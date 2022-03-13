@@ -11,8 +11,8 @@
 #                    （4）画直方图；
 #                    （5）画雷达图；
 #                    （6）将昨天开会的要求实现；
-#                           具体是第一步要完成颜色循环的调研；
-#                           第二步是代码实现。
+#                           下一步的目标是想想有没有更好的实现方法。
+#                           再下一个目标是将其它图像以及还没有实现的图像完整的做好
 #                    （7）画动态图像；
 #                    （8）根据李老师的指导方针完善本模块的功能。
 
@@ -20,22 +20,16 @@
 # todo:完善文档。
 # todo:模块开发宗旨：让使用者只修改接口就可完成期待图像的绘制，不需要关注plot模块中的具体代码操作。
 
-
 import os
 from plot_wzs import Plotter
 import plot_config
 from datetime import datetime
 import matplotlib.pyplot as plt
-# import matplotlib.font_manager
-# from matplotlib import colors
-from cycler import cycler
 
-# colors.CSS4_COLORS
-c_cyc = plt.rcParams['axes.prop_cycle'].by_key()['color']
-print(c_cyc)
-def main(scheme, font, figsize, dpi, color, title):
+
+def main(scheme, font, figsize, dpi, color, label, ticks, title, legend):
     """图像绘制入口"""
-    draw = Plotter(scheme, font, figsize, dpi, color, title)
+    draw = Plotter(scheme, font, figsize, dpi, color, label, ticks, title, legend)
     draw.plot()
 
     # 图像保存
@@ -55,9 +49,12 @@ if __name__ == '__main__':
     main(plot_config.SCHEME[0],       # 画图方案
          plot_config.FONT[0],         # 字体
          plot_config.FIG_SIZE[0],     # 图像尺寸
-         plot_config.DPI[0],          # 打印分辨率
-         plot_config.GRAPH_COLOR[4],  # 图形颜色
-         plot_config.TITLE)           # 图像标题
+         plot_config.DPI[0],          # 打印分辨率 todo:这种一个的可以直接写在这里
+         plot_config.GRAPH_COLOR,     # 图形颜色
+         plot_config.LABEL,           # 轴标签字号和颜色配置
+         plot_config.TICKS,           # 轴刻度字体和字号配置
+         plot_config.TITLE,           # 图像标题
+         plot_config.LEGEND)          # 图例字号设置
 
 
 

@@ -22,14 +22,17 @@ FIG_SIZE = {0: (12, 8),      # figsize=(a,b) 设置图形的大小，a为图形�
 DPI = {0: 300,                # dpi 为设置图像每英寸的点数
        1: 600}
 
-# 不同个数图形的颜色选择
-GRAPH_COLOR = [{0: 'lightseagreen'},
-               {0: 'deepskyblue'},
-               {0: 'blue'},
-               {0: 'yellow'},
-               {0: 'pink', 1: 'cyan'},
-               {0: 'olive', 1: 'cyan'},
-               {0: 'red', 1: 'blue', 2: 'black'}]
+# 图形颜色选择
+GRAPH_COLOR = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 
-# 图像标题字号和颜色
+# 轴标签字号和颜色设置
+LABEL = {'label_size': 20, 'label_color': 'black'}
+
+# 轴刻度字体和字号设置
+TICKS = {'tick_font': 'Times New Roman', 'tick_size': 15}
+
+# 图像标题字号和颜色设置
 TITLE = {'font_size': 25, 'font_color': 'black'}
+
+# 图例字号设置
+LEGEND = {'leg_size': 20}

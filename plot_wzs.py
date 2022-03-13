@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
 from datetime import datetime
+from cycler import cycler
 
 
 print(matplotlib.matplotlib_fname())
@@ -15,17 +16,24 @@ print(matplotlib.matplotlib_fname())
 class Plotter():
     """画图"""
 
-    def __init__(self, scheme, font, figsize, dpi, color, title):
+    def __init__(self, scheme, font, figsize, dpi, color, label, ticks, title, legend):
         self.scheme = scheme
         self.font = font
         self.figsize = figsize
         self.dpi = dpi
         self.color = color
+        self.label = label
+        self.ticks = ticks
         self.title = title
-        print(self.font)
+        self.legend = legend
+
+        # 字体及正负号显示设置
         matplotlib.rcParams['font.sans-serif'] = self.font  # ['KaiTi']  # 解决中文显示的问题 todo:字体列表
         matplotlib.rcParams['axes.unicode_minus'] = False  # 解决正负号显示的问题
 
+        # 颜色循环设置
+        color_cycler = cycler(color=color)
+        plt.rc('axes', prop_cycle=color_cycler)  # 设置绘图区属性
 
     def plot(self):
         if self.scheme == '单变量-曲线图':
@@ -50,13 +58,26 @@ class Plotter():
         sin_y = np.sin(x)
         cos_y = np.cos(x)
 
+        # 图像尺寸和dpi设置
         plt.figure(figsize=self.figsize, dpi=self.dpi)
-        plt.plot(x, sin_y, color=self.color[0], label='sin(x)')  # todo:颜色列表[red blue black]
-        plt.plot(x, cos_y, color=self.color[1], label='cos(x)', linestyle='-.')  # todo[: - -. --]
-        plt.xlabel('输入数据 x')
-        plt.ylabel('sin(x) 或者 cos(x)')
+
+        plt.plot(x, sin_y, label='sin(x)')
+        plt.plot(x, cos_y, label='cos(x)', linestyle='-.')
+
+        # plt.plot(x, sin_y, color=self.color[0], label='sin(x)')
+        # plt.plot(x, cos_y, color=self.color[1], label='cos(x)', linestyle='-.')
+
+        # label字号和颜色设置：20
+        plt.xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.ylabel('sin(x) 或者 cos(x)', fontsize=self.label['label_size'], color=self.label['label_color'])
+
+        # 刻度字体和字号设置
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+
+        # title字号和颜色设置
         plt.title('三角函数图', fontsize=self.title['font_size'], color=self.title['font_color'])
-        plt.legend()
+        plt.legend(fontsize=self.legend['leg_size'])
 
     def scatter(self):
         """
@@ -66,7 +87,10 @@ class Plotter():
         x = np.random.normal(0, 1, size=10000)
         y = np.random.normal(0, 1, size=10000)
 
-        plt.scatter(x, y, color=self.color[0], marker='o', alpha=0.1, label='二维正态分布的点')
+        plt.figure(figsize=self.figsize, dpi=self.dpi)
+        plt.scatter(x, y, marker='o', alpha=0.1, label='二维正态分布的点')
+
+        # plt.scatter(x, y, color=self.color[0], marker='o', alpha=0.1, label='二维正态分布的点')
         plt.title('二维正态分布散点图')
         plt.xlabel('正太分布 x')
         plt.ylabel('正态分布 y')
@@ -82,8 +106,12 @@ class Plotter():
         mu, sigma = 100, 15
         x = mu + sigma * np.random.randn(10000)
 
+        plt.figure(figsize=self.figsize, dpi=self.dpi)
+
         # the histogram of the data
-        n, bins, patches = plt.hist(x, 50, density=True, color='green', alpha=0.75)
+        n, bins, patches = plt.hist(x, 50, density=True, alpha=0.75)
+
+        # n, bins, patches = plt.hist(x, 50, density=True, color='green', alpha=0.75)
 
         plt.xlabel('Smarts')
         plt.ylabel('Probability')
@@ -116,15 +144,18 @@ class Plotter():
         labels = np.concatenate((labels, [labels[0]]))
 
         # 设置图形的大小
-        fig = plt.figure(figsize=(8, 6), dpi=100)
+        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
 
         # 新建一个子图
         # ax = plt.subplot(111, polar=True)
         ax = fig.add_subplot(111, projection='polar')
 
         # 绘制雷达图
-        ax.plot(angles, score_a, "o-", color='g')
-        ax.plot(angles, score_b, "o-", color='b')
+        ax.plot(angles, score_a, "o-")
+        ax.plot(angles, score_b, "o-")
+
+        # ax.plot(angles, score_a, "o-", color='g')
+        # ax.plot(angles, score_b, "o-", color='b')
 
         # 设置雷达图中每一项的标签显示
         ax.set_thetagrids(angles * 180 / np.pi, labels)
@@ -142,8 +173,11 @@ class Plotter():
         plt.tight_layout()
         ax.tick_params(pad=12, grid_color='k', grid_alpha=0.2, grid_linestyle=(0, (5, 5)))
 
-        plt.fill(angles, score_a, facecolor='green', alpha=0.2)
-        plt.fill(angles, score_b, facecolor='blue', alpha=0.5)
+        plt.fill(angles, score_a, alpha=0.5)
+        plt.fill(angles, score_b, alpha=0.5)
+
+        # plt.fill(angles, score_a, facecolor='green', alpha=0.2)
+        # plt.fill(angles, score_b, facecolor='blue', alpha=0.5)
 
     def polygon_radar(self):
         """
@@ -164,7 +198,7 @@ class Plotter():
         angles = np.concatenate((angles, [angles[0]]))
         labels = np.concatenate((labels, [labels[0]]))
 
-        fig = plt.figure(figsize=(10, 6), dpi=100)
+        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         fig.suptitle("计算机专业大一（上）")
         ax1 = plt.subplot(121, polar=True)
         ax2 = plt.subplot(122, polar=True)
@@ -179,7 +213,8 @@ class Plotter():
                 ax[i].plot([angles[j], angles[j]], [0, 100], '-.', lw=0.5, color='black')
 
             # 开始在雷达地图上绘制图形
-            ax[i].plot(angles, data[i], color='b')
+            ax[i].plot(angles, data[i])
+            # ax[i].plot(angles, data[i], color='b')
 
             # 隐藏最外圈的圆
             ax[i].spines['polar'].set_visible(False)
