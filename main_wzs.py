@@ -11,59 +11,53 @@
 #                    （4）画直方图；
 #                    （5）画雷达图；
 #                    （6）将昨天开会的要求实现；
+#                           具体是第一步要完成颜色循环的调研；
+#                           第二步是代码实现。
 #                    （7）画动态图像；
 #                    （8）根据李老师的指导方针完善本模块的功能。
 
 
-# todo: 下午看海桐的画图代码，
-#  明天上午的任务是完善文档。
+# todo:完善文档。
 # todo:模块开发宗旨：让使用者只修改接口就可完成期待图像的绘制，不需要关注plot模块中的具体代码操作。
 
-# 注意；会编程了就千万不要所有的东西都自己写了，现在追求的应该是更高层次的目标，
-# 即又好又快的实现目的，而不必在乎用的什么手段，比如抄和改写。
 
 import os
-
-import matplotlib.font_manager
-
 from plot_wzs import Plotter
 import plot_config
-from matplotlib import font_manager
 from datetime import datetime
 import matplotlib.pyplot as plt
+# import matplotlib.font_manager
+# from matplotlib import colors
+from cycler import cycler
 
-
-def main(scheme, color):
+# colors.CSS4_COLORS
+c_cyc = plt.rcParams['axes.prop_cycle'].by_key()['color']
+print(c_cyc)
+def main(scheme, font, figsize, dpi, color, title):
     """图像绘制入口"""
-    draw = Plotter(scheme, color)
+    draw = Plotter(scheme, font, figsize, dpi, color, title)
     draw.plot()
 
     # 图像保存
-    log_dir = './figure/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    figure_dir = './Figures'
+    os.makedirs(figure_dir, exist_ok=True)
+    log_dir = './Figures/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     os.makedirs(log_dir, exist_ok=True)
     plt.savefig(fname=log_dir + '/polygon_radar.jpg')
-
-
-
-
-    # for font in font_manager.fontManager.ttflist:
-    #     # 查看字体名以及对应的字体文件名
-    #     # print(font.name, '   ==||==   ', font.fname)
-    #     print(font.name)
-
-    # # matplotlib 查看所有可设置字体及设置中文字体
-    # a = sorted([f.name for f in matplotlib.font_manager.fontManager.ttflist])
-    # for i in a:
-    #     print(i)
-
-
+    plt.savefig(fname=log_dir + '/polygon_radar.pdf')
+    plt.savefig(fname=log_dir + '/polygon_radar.svg')
 
 
 
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
-    print('--欢迎来到LasVSim的绘图世界！永远记得实力捍卫尊严！')
-    main(plot_config.SCHEME[0], plot_config.GRAPH_COLOR[4])
+    print('--欢迎来到LasVSim的绘图世界！我想要成功！')
+    main(plot_config.SCHEME[0],       # 画图方案
+         plot_config.FONT[0],         # 字体
+         plot_config.FIG_SIZE[0],     # 图像尺寸
+         plot_config.DPI[0],          # 打印分辨率
+         plot_config.GRAPH_COLOR[4],  # 图形颜色
+         plot_config.TITLE)           # 图像标题
 
 
 
@@ -89,3 +83,6 @@ if __name__ == '__main__':
 
 # 经验：有时候先实现一个小例子，然后再写整体方案反而更加简单。
 # 经验：先调研再实现会简单很多。
+
+# 注意；会编程了就千万不要所有的东西都自己写了，现在追求的应该是更高层次的目标，
+# 即又好又快的实现目的，而不必在乎用的什么手段，比如抄和改写。

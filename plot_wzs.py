@@ -9,36 +9,23 @@ import numpy as np
 import matplotlib
 from datetime import datetime
 
-font = {'黑体': 'SimHei',
-        '微软雅黑': 'Microsoft YaHei',
-        '微软正黑体': 'Microsoft JhengHei',
-
-        '新宋体': 'NSimSun',  # 不可用
-        '新细明体': 'PMingLiU',
-        '细明体': 'MingLiU',
-        '标楷体': 'DFKai-SB',
-
-        '仿宋': 'FangSong',
-        '楷体': 'KaiTi',
-
-        '仿宋_GB2312': 'FangSong_GB2312',  # 不可用
-        '楷体_GB2312': 'KaiTi_GB2312'}
-
-# matplotlib.rcParams['font.sans-serif'] = font['楷体']  # ['SimHei']  # ['KaiTi']  # 解决中文显示的问题 todo:字体列表
-
-matplotlib.rcParams['font.family'] = 'SimSun'  # ['KaiTi']  # 解决中文显示的问题 todo:字体列表
-
-# matplotlib.rcParams['font.sans-serif'] = ['Tahoma']  # ['KaiTi']  # 解决中文显示的问题 todo:字体列表
-matplotlib.rcParams['axes.unicode_minus'] = False  # 解决正负号显示的问题
 
 print(matplotlib.matplotlib_fname())
 
 class Plotter():
     """画图"""
 
-    def __init__(self, scheme, color):
+    def __init__(self, scheme, font, figsize, dpi, color, title):
         self.scheme = scheme
+        self.font = font
+        self.figsize = figsize
+        self.dpi = dpi
         self.color = color
+        self.title = title
+        print(self.font)
+        matplotlib.rcParams['font.sans-serif'] = self.font  # ['KaiTi']  # 解决中文显示的问题 todo:字体列表
+        matplotlib.rcParams['axes.unicode_minus'] = False  # 解决正负号显示的问题
+
 
     def plot(self):
         if self.scheme == '单变量-曲线图':
@@ -54,8 +41,6 @@ class Plotter():
         else:
             return 0
 
-
-
     def single_variable_plot(self):
         """
         绘制单变量-曲线图
@@ -65,17 +50,13 @@ class Plotter():
         sin_y = np.sin(x)
         cos_y = np.cos(x)
 
+        plt.figure(figsize=self.figsize, dpi=self.dpi)
         plt.plot(x, sin_y, color=self.color[0], label='sin(x)')  # todo:颜色列表[red blue black]
         plt.plot(x, cos_y, color=self.color[1], label='cos(x)', linestyle='-.')  # todo[: - -. --]
         plt.xlabel('输入数据 x')
-        plt.ylabel('sin(x)或者cos(x)')
-        plt.title('三角函数图')
+        plt.ylabel('sin(x) 或者 cos(x)')
+        plt.title('三角函数图', fontsize=self.title['font_size'], color=self.title['font_color'])
         plt.legend()
-
-        # log_dir = './figure/'+datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        # os.makedirs(log_dir, exist_ok=True)
-        # plt.savefig(fname=log_dir + '/plot.jpg')
-        # plt.show()
 
     def scatter(self):
         """
@@ -90,11 +71,6 @@ class Plotter():
         plt.xlabel('正太分布 x')
         plt.ylabel('正态分布 y')
         plt.legend()
-
-        # log_dir = './figure/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        # os.makedirs(log_dir, exist_ok=True)
-        # plt.savefig(fname=log_dir + '/scatter.jpg')
-        # plt.show()
 
     def hist(self):
         """
@@ -118,11 +94,6 @@ class Plotter():
         plt.xlim(40, 160)
         plt.ylim(0, 0.03)
         plt.grid(True)
-
-        # log_dir = './figure/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        # os.makedirs(log_dir, exist_ok=True)
-        # plt.savefig(fname=log_dir + '/hist.jpg')
-        # plt.show()
 
     def circle_radar(self):
         """
@@ -174,52 +145,6 @@ class Plotter():
         plt.fill(angles, score_a, facecolor='green', alpha=0.2)
         plt.fill(angles, score_b, facecolor='blue', alpha=0.5)
 
-        # log_dir = './figure/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        # os.makedirs(log_dir, exist_ok=True)
-        # plt.savefig(fname=log_dir + '/circle_radar.jpg')
-
-        # plt.show()
-
-        ##################################################################
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='polar')  # 创建极坐标的Axes对象
-        # # ax = plt.subplot(111, polar=True)
-        # ## 创建数据字典
-        # p1 = {'经济性': 60, '安全性': 70, '舒适性': 65, '可靠性': 75, '互换性': 80}  # 创建第一个的数据
-        # p2 = {'经济性': 70, '安全性': 65, '舒适性': 83, '可靠性': 70, '互换性': 67}  # 创建第二个的数据
-        #
-        # ## 提取数值信息和标签信息
-        # data1 = np.array([i for i in p1.values()]).astype(int)
-        # data2 = np.array([i for i in p2.values()]).astype(int)
-        # label = np.array([j for j in p1.keys()])
-        #
-        # theta = np.linspace(0, 2 * np.pi, len(data1), endpoint=False)  # 计算区间角度
-        # thetas = np.concatenate((theta, [theta[0]]))  # 添加第一个角度数据，实现闭合
-        # data1 = np.concatenate((data1, [data1[0]]))  # 添加第一个指标数据，实现闭合
-        # data2 = np.concatenate((data2, [data2[0]]))
-        # labels = np.concatenate((label, [label[0]]))  # 添加第一个标签数据，实现闭合
-        #
-        # ax.set_thetagrids(thetas * 180 / np.pi, labels)  # 设置网格标签，单位转化成度数
-        # ax.plot(thetas, data1, "o-", label='产品A')
-        # ax.plot(thetas, data2, "o-", label='产品B')
-        #
-        # ax.set_theta_zero_location('N')  # 设置极坐标0°位置
-        # ax.set_rlim(0, 100)  # 设置显示的极径范围
-        # ax.fill(thetas, data1, facecolor='g', alpha=0.2)  # 填充颜色
-        # ax.fill(thetas, data2, facecolor='r', alpha=0.2)
-        # ax.legend(loc=(0.9, 0.9))
-        # ax.set_rlabel_position(40)  # 设置极径标签位置
-        #
-        # # grid_linestyle的解释：每个线段长5，间隔长度5，从线长5的0处开始绘制
-        # ax.tick_params(pad=12, grid_color='k', grid_alpha=0.2, grid_linestyle=(0, (5, 5)))
-        # plt.tight_layout()
-        #
-        # log_dir = './figure/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        # os.makedirs(log_dir, exist_ok=True)
-        # plt.savefig(fname=log_dir + '/circle_radar.jpg')
-        #
-        # # plt.show()
-
     def polygon_radar(self):
         """
         绘制多边形雷达图
@@ -269,8 +194,3 @@ class Plotter():
             ax[i].set_rlabel_position(0)
             ax[i].set_title(name[i])
         plt.tight_layout()
-        # log_dir = './figure/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        # os.makedirs(log_dir, exist_ok=True)
-        # plt.savefig(fname=log_dir + '/polygon_radar.jpg')
-
-        # plt.show()
