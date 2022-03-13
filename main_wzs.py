@@ -45,8 +45,8 @@ def main(scheme, font, figsize, dpi, color, label, ticks, title, legend):
 
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
-    print('--欢迎来到LasVSim的绘图世界！我想要成功！')
-    main(plot_config.SCHEME[0],       # 画图方案
+    print('--欢迎来到LasVSim的绘图世界！成功！')
+    main(plot_config.SCHEME[5],       # 画图方案
          plot_config.FONT[0],         # 字体
          plot_config.FIG_SIZE[0],     # 图像尺寸
          plot_config.DPI[0],          # 打印分辨率 todo:这种一个的可以直接写在这里

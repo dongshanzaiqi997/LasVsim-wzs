@@ -9,13 +9,13 @@ import numpy as np
 import matplotlib
 from datetime import datetime
 from cycler import cycler
+# import pandas
 
 
 print(matplotlib.matplotlib_fname())
 
 class Plotter():
     """画图"""
-
     def __init__(self, scheme, font, figsize, dpi, color, label, ticks, title, legend):
         self.scheme = scheme
         self.font = font
@@ -28,7 +28,7 @@ class Plotter():
         self.legend = legend
 
         # 字体及正负号显示设置
-        matplotlib.rcParams['font.sans-serif'] = self.font  # ['KaiTi']  # 解决中文显示的问题 todo:字体列表
+        matplotlib.rcParams['font.sans-serif'] = self.font
         matplotlib.rcParams['axes.unicode_minus'] = False  # 解决正负号显示的问题
 
         # 颜色循环设置
@@ -36,12 +36,23 @@ class Plotter():
         plt.rc('axes', prop_cycle=color_cycler)  # 设置绘图区属性
 
     def plot(self):
+        """ 各种图像绘制的具体实现 """
         if self.scheme == '单变量-曲线图':
             self.single_variable_plot()
-        elif self.scheme == '散点图':
-            self.scatter()
+        elif self.scheme == '单变量-散点图':
+            self.single_variable_scatter()
         elif self.scheme == '单变量-直方图':
-            self.hist()
+            self.single_variable_hist()
+        elif self.scheme == '相关变量-曲线图':
+            self.correlated_variable_plot()
+        elif self.scheme == '相关变量-散点图':
+            self.correlated_variable_scatter()
+        elif self.scheme == '双Y轴-曲线图':
+            self.double_y_plot()
+        elif self.scheme == '双Y轴-散点图':
+            self.double_y_scatter()
+        elif self.scheme == '双Y轴-直方图':
+            self.double_y_hist()
         elif self.scheme == '圆形雷达图':
             self.circle_radar()
         elif self.scheme == '多边形雷达图':
@@ -54,35 +65,113 @@ class Plotter():
         绘制单变量-曲线图
         这是第1个绘图方案
         """
-        x = np.linspace(-2*np.pi, 2*np.pi, 400)
-        sin_y = np.sin(x)
-        cos_y = np.cos(x)
+        x = np.arange(10)
+        y = np.random.randn(10)
 
         # 图像尺寸和dpi设置
         plt.figure(figsize=self.figsize, dpi=self.dpi)
 
-        plt.plot(x, sin_y, label='sin(x)')
-        plt.plot(x, cos_y, label='cos(x)', linestyle='-.')
-
-        # plt.plot(x, sin_y, color=self.color[0], label='sin(x)')
-        # plt.plot(x, cos_y, color=self.color[1], label='cos(x)', linestyle='-.')
+        plt.plot(x, y, label='y')
 
         # label字号和颜色设置：20
         plt.xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        plt.ylabel('sin(x) 或者 cos(x)', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.ylabel('输出数据 y', fontsize=self.label['label_size'], color=self.label['label_color'])
 
         # 刻度字体和字号设置
         plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
         plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
 
         # title字号和颜色设置
-        plt.title('三角函数图', fontsize=self.title['font_size'], color=self.title['font_color'])
-        plt.legend(fontsize=self.legend['leg_size'])
+        plt.title('单变量-曲线图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        plt.legend(fontsize=self.legend['leg_size'], loc='best')
 
-    def scatter(self):
+    def single_variable_scatter(self):
         """
-        绘制散点图
+        绘制'单变量-散点图'
         这是第2个绘图方案
+        """
+        rng = np.random.RandomState(0)  # 产生伪随机数，类似numpy.random.seed()的作用
+        x = range(10)
+        y = rng.randn(10)  # 从标准正太分布中返回10个样本值
+
+        colors = rng.rand(10)  # 产生10个介于[0，1]之间的数值，用于颜色映射的数值
+        sizes = 700 * rng.rand(10)  # 用于改变散点面积的数值
+
+        plt.figure(figsize=self.figsize, dpi=self.dpi)
+
+        # plt.scatter(x, y, c=colors, s=sizes, alpha=0.3, cmap='viridis')
+        plt.scatter(x, y, marker='o', s=sizes, alpha=0.3, cmap='viridis', label='散点图')
+        # plt.colorbar()  # 显示颜色条
+
+        plt.title('单变量-散点图', fontsize=self.title['font_size'], color=self.title['font_color'])
+
+        plt.xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.ylabel('随机数据 y', fontsize=self.label['label_size'], color=self.label['label_color'])
+
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+
+        plt.legend(fontsize=self.legend['leg_size'], loc='best')
+
+    def single_variable_hist(self):
+        """
+        绘制’单变量-直方图’
+        这是第3个绘图方案
+        """
+        np.random.seed(19680801)  # 为了重现固定的随机状态
+
+        mu, sigma = 100, 15
+        x = mu + sigma * np.random.randn(10000)  # 正太分布
+
+        plt.figure(figsize=self.figsize, dpi=self.dpi)
+
+        # the histogram of the data
+        plt.hist(x, 50, density=True, alpha=0.75, label='正太分布直方图')
+
+        plt.xlabel('Smarts', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.ylabel('Probability', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.title('Histogram of IQ', fontsize=self.title['font_size'], color=self.title['font_color'])
+
+        # r是指定它后面的字符串是原始的字符串，然后用$包裹表示中间的是数学表达式，\表示转译具体的数学符号。
+        plt.text(60, .025, r'$\mu=100,\ \sigma=15$')
+        plt.xlim(40, 160)
+        plt.ylim(0, 0.03)
+
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+
+        plt.legend(fontsize=self.legend['leg_size'], loc='best')
+        plt.grid(True)
+
+    def correlated_variable_plot(self):
+        """
+        绘制‘相关变量-曲线图’
+        这是第4个绘图方案
+        """
+        x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
+        sin_y = np.sin(x)
+
+        # 图像尺寸和dpi设置
+        plt.figure(figsize=self.figsize, dpi=self.dpi)
+
+        plt.plot(x, sin_y, label='sin(x)')
+
+        # label字号和颜色设置：20
+        plt.xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.ylabel('sin(x)', fontsize=self.label['label_size'], color=self.label['label_color'])
+
+        # 刻度字体和字号设置
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+
+        # title字号和颜色设置
+        plt.title('相关变量曲线图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        plt.legend(fontsize=self.legend['leg_size'], loc='best')
+
+    def correlated_variable_scatter(self):
+        """
+        绘制‘相关变量-散点图’
+        这是第5个绘图方案
         """
         x = np.random.normal(0, 1, size=10000)
         y = np.random.normal(0, 1, size=10000)
@@ -91,42 +180,67 @@ class Plotter():
         plt.scatter(x, y, marker='o', alpha=0.1, label='二维正态分布的点')
 
         # plt.scatter(x, y, color=self.color[0], marker='o', alpha=0.1, label='二维正态分布的点')
-        plt.title('二维正态分布散点图')
-        plt.xlabel('正太分布 x')
-        plt.ylabel('正态分布 y')
-        plt.legend()
+        # 刻度字体和字号设置
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
 
-    def hist(self):
+        plt.title('相关变量-散点图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        plt.xlabel('正太分布 x', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.ylabel('正态分布 y', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.legend(fontsize=self.legend['leg_size'], loc='best')
+
+    def double_y_plot(self):
         """
-        绘制直方图
-        这是第3个绘图方案
+        绘制‘双Y轴-曲线图’
+        这是第6个绘图方案
         """
-        np.random.seed(19680801)  # 为了重现固定的随机状态
+        x = np.arange(0.1, np.e, 0.01)
+        y1 = np.exp(-x)
+        y2 = np.log(x)
 
-        mu, sigma = 100, 15
-        x = mu + sigma * np.random.randn(10000)
+        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+        ax1 = fig.add_subplot(111)
 
-        plt.figure(figsize=self.figsize, dpi=self.dpi)
+        plt.title('双Y轴-曲线图', fontsize=20)
+        plt.grid(axis='y', color='grey', linestyle='--', lw=0.5, alpha=0.5)
+        plt.tick_params(axis='both', labelsize=14)
+        plot1 = ax1.plot(x, y1, label='No. of Players Drafted')
+        ax1.set_ylabel('Number of Players Drafted', fontsize=18)
 
-        # the histogram of the data
-        n, bins, patches = plt.hist(x, 50, density=True, alpha=0.75)
 
-        # n, bins, patches = plt.hist(x, 50, density=True, color='green', alpha=0.75)
+        ax2 = ax1.twinx()
+        plot2 = ax2.plot(x, y2, 'g', label='Avg WS/48')  # todo:选一个稀有的颜色
+        ax2.set_ylabel('Win Shares Per 48 minutes', fontsize=18)
 
-        plt.xlabel('Smarts')
-        plt.ylabel('Probability')
-        plt.title('Histogram of IQ')
+        ax2.tick_params(axis='y', labelsize=14)
 
-        # r是指定它后面的字符串是原始的字符串，然后用$包裹表示中间的是数学表达式，\表示转译具体的数学符号。
-        plt.text(60, .025, r'$\mu=100,\ \sigma=15$')
-        plt.xlim(40, 160)
-        plt.ylim(0, 0.03)
-        plt.grid(True)
+        lines = plot1 + plot2
+        ax1.legend(lines, [l.get_label() for l in lines])
+        ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 9))
+        ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 9))
+
+
+
+    def double_y_scatter(self):
+        """
+        绘制‘双Y轴-散点图’
+        这是第7个绘图方案
+        """
+
+        pass
+
+    def double_y_hist(self):
+        """
+        绘制‘双Y轴-直方图’
+        这是第8个绘图方案
+        """
+
+        pass
 
     def circle_radar(self):
         """
         绘制圆形雷达图
-        这是第4个绘图方案
+        这是第9个绘图方案
         """
         results = [{"大学英语": 87, "高等数学": 79, "体育": 95, "计算机基础": 92, "程序设计": 85},
                    {"大学英语": 80, "高等数学": 90, "体育": 91, "计算机基础": 85, "程序设计": 88}]
@@ -182,7 +296,7 @@ class Plotter():
     def polygon_radar(self):
         """
         绘制多边形雷达图
-        这是第5个绘图方案
+        这是第10个绘图方案
         """
         results = [{"大学英语": 87, "高等数学": 79, "体育": 95, "计算机基础": 92, "程序设计": 85},
                    {"大学英语": 80, "高等数学": 90, "体育": 91, "计算机基础": 85, "程序设计": 88}]
