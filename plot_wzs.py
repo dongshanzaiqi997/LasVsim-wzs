@@ -235,6 +235,7 @@ class Plotter():
         plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
         plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
 
+        # 利用方法x.twinx()在原来坐标轴上建立第二个坐标轴
         ax2 = ax1.twinx()
         s2 = ax2.scatter(x, y2, c='fuchsia', label='对数函数')
         ax2.set_ylabel('对数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
@@ -272,7 +273,7 @@ class Plotter():
                    bbox_transform=ax1.transAxes,
                    fontsize=self.legend['leg_size'])
 
-    def circle_radar(self):  # todo: 睡醒之后待解决的下一个目标
+    def circle_radar(self):
         """
         绘制圆形雷达图
         这是第9个绘图方案
@@ -312,17 +313,28 @@ class Plotter():
         # 设置雷达图的坐标刻度范围
         ax.set_rlim(0, 100)
 
+        # 极径网格线和标签显示(这个方法类似plt.yticks())
+        ax.set_rgrids(np.arange(0, 120, 20),
+                      labels=np.arange(0, 120, 20),
+                      fontproperties=self.ticks['tick_font'],
+                      size=self.ticks['tick_size'])
+
         # 设置雷达图的坐标值显示角度，相对于起始角度的偏移量
         ax.set_rlabel_position(270)
         ax.set_title("圆形雷达图", fontsize=self.title['font_size'], color=self.title['font_color'])
         plt.legend(["弓长张", "口天吴"], loc='best', fontsize=self.legend['leg_size'])
+
+        # 图像在画布上充分填充
         # plt.tight_layout()
+
+        # 指标标签的属性配置
         ax.tick_params(pad=20, grid_color='k', grid_alpha=0.2, grid_linestyle=(0, (5, 5)), size=10)
 
+        # 雷达图的填充
         plt.fill(angles, score_a, alpha=0.5)
         plt.fill(angles, score_b, alpha=0.5)
 
-    def polygon_radar(self):
+    def polygon_radar(self):  # todo: 待解决的下一个目标
         """
         绘制多边形雷达图
         这是第10个绘图方案
@@ -342,7 +354,7 @@ class Plotter():
         labels = np.concatenate((labels, [labels[0]]))
 
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        fig.suptitle("计算机专业大一（上）")
+        fig.suptitle("多边形雷达图", fontsize=self.title['font_size'], color=self.title['font_color'])
         ax1 = plt.subplot(121, polar=True)
         ax2 = plt.subplot(122, polar=True)
         ax, data, name = [ax1, ax2], [score_a, score_b], ["弓长张", "口天吴"]
@@ -352,7 +364,7 @@ class Plotter():
             # 下面的两个for循环的作用是画雷达底图
             for j in np.arange(0, 100 + 20, 20):  # 画圆
                 ax[i].plot(angles, 6 * [j], '-.', lw=0.5, color='black')
-            for j in range(5):
+            for j in range(5):  # 绘制雷达图的极径骨架
                 ax[i].plot([angles[j], angles[j]], [0, 100], '-.', lw=0.5, color='black')
 
             # 开始在雷达地图上绘制图形
@@ -364,11 +376,26 @@ class Plotter():
 
             # 隐藏圆形网格线
             ax[i].grid(False)
-            for a, b in zip(angles, data[i]):
-                ax[i].text(a, b + 5, '%.00f' % b, ha='right', va='center', fontsize=12, color='b')
-            ax[i].set_thetagrids(angles * 180 / np.pi, labels)
+            for a, b in zip(angles, data[i]):  # 将每一项指标的数值显示在雷达图上其应在的位置
+                ax[i].text(a, b + 5, '%.00f' % b, ha='right', va='center', fontsize=15, color='b')
+            ax[i].set_thetagrids(angles * 180 / np.pi, labels, size=self.label['label_size'], color=self.label['label_color'])
+
+            # 设置极坐标零度朝向
             ax[i].set_theta_zero_location('N')
+
+            # 设置极径刻度范围
             ax[i].set_rlim(0, 100)
+
+            # 极径网格线和标签显示(这个方法类似plt.yticks())
+            ax[i].set_rgrids(np.arange(0, 120, 20),
+                          labels=np.arange(0, 120, 20),
+                          fontproperties=self.ticks['tick_font'],
+                          size=self.ticks['tick_size'])
+
+            # 极径标签的角度（相对极坐标的初始零度）位置
             ax[i].set_rlabel_position(0)
+
+            # 设置每一个单独的子图的标题（注意：不是整幅图像的标题）
             ax[i].set_title(name[i])
+        # plt.legend(loc='best', fontsize=self.legend['leg_size'])  # 这种不需要再画图例了
         plt.tight_layout()
