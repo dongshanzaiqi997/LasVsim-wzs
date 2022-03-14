@@ -10,6 +10,7 @@ import matplotlib
 from datetime import datetime
 from cycler import cycler
 # import pandas
+# import constants as cst
 
 
 print(matplotlib.matplotlib_fname())
@@ -201,49 +202,83 @@ class Plotter():
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         ax1 = fig.add_subplot(111)
 
-        plt.title('双Y轴-曲线图', fontsize=20)
-        plt.grid(axis='y', color='grey', linestyle='--', lw=0.5, alpha=0.5)
-        plt.tick_params(axis='both', labelsize=14)
-        plot1 = ax1.plot(x, y1, label='No. of Players Drafted')
-        ax1.set_ylabel('Number of Players Drafted', fontsize=18)
-
+        plt.title('双Y轴-曲线图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        plot1 = ax1.plot(x, y1, label='指数函数')
+        ax1.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
 
         ax2 = ax1.twinx()
-        plot2 = ax2.plot(x, y2, 'g', label='Avg WS/48')  # todo:选一个稀有的颜色
-        ax2.set_ylabel('Win Shares Per 48 minutes', fontsize=18)
-
-        ax2.tick_params(axis='y', labelsize=14)
-
+        plot2 = ax2.plot(x, y2, 'fuchsia', label='对数函数')
+        ax2.set_ylabel('对数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
         lines = plot1 + plot2
-        ax1.legend(lines, [l.get_label() for l in lines])
-        ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 9))
-        ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 9))
-
-
+        ax1.legend(lines, [l.get_label() for l in lines], fontsize=self.legend['leg_size'], loc='best')
 
     def double_y_scatter(self):
         """
         绘制‘双Y轴-散点图’
         这是第7个绘图方案
         """
+        x = np.arange(0.1, np.e, 0.1)
+        y1 = np.exp(-x)
+        y2 = np.log(x)
 
-        pass
+        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+        ax1 = fig.add_subplot(111)
+
+        plt.title('双Y轴-散点图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        s1 = ax1.scatter(x, y1, label='指数函数')
+        ax1.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_c olor'])
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+
+        ax2 = ax1.twinx()
+        s2 = ax2.scatter(x, y2, c='fuchsia', label='对数函数')
+        ax2.set_ylabel('对数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.legend(handles=[s1, s2], fontsize=self.legend['leg_size'], loc='best')
 
     def double_y_hist(self):
         """
         绘制‘双Y轴-直方图’
         这是第8个绘图方案
         """
+        np.random.seed(19680801)  # 为了重现固定的随机状态
 
-        pass
+        mu1, sigma1, mu2,  sigma2 = 100, 15, 120, 10
+        x1 = mu1 + sigma1 * np.random.randn(10000)  # 正太分布
+        x2 = mu2 + sigma2 * np.random.randn(10000)  # 正太分布
 
-    def circle_radar(self):
+        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+        ax1 = fig.add_subplot(111)
+
+        plt.title('双Y轴-直方图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        ax1.hist(x1, 50, density=True, alpha=0.75, label='指数函数')
+        ax1.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+
+        ax2 = ax1.twinx()
+        ax2.hist(x2, 50, density=True, alpha=0.75, color='fuchsia', label='对数函数')
+        ax2.set_ylabel('对数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+
+        fig.legend(loc='upper right',
+                   bbox_to_anchor=(1, 1),
+                   bbox_transform=ax1.transAxes,
+                   fontsize=self.legend['leg_size'])
+
+    def circle_radar(self):  # todo: 睡醒之后待解决的下一个目标
         """
         绘制圆形雷达图
         这是第9个绘图方案
         """
         results = [{"大学英语": 87, "高等数学": 79, "体育": 95, "计算机基础": 92, "程序设计": 85},
-                   {"大学英语": 80, "高等数学": 90, "体育": 91, "计算机基础": 85, "程序设计": 88}]
+                   {"大学英语": 80, "高等数学": 99, "体育": 81, "计算机基础": 85, "程序设计": 61}]
         data_length = len(results[0])
 
         # 将极坐标根据数据长度进行等分
@@ -268,11 +303,8 @@ class Plotter():
         ax.plot(angles, score_a, "o-")
         ax.plot(angles, score_b, "o-")
 
-        # ax.plot(angles, score_a, "o-", color='g')
-        # ax.plot(angles, score_b, "o-", color='b')
-
         # 设置雷达图中每一项的标签显示
-        ax.set_thetagrids(angles * 180 / np.pi, labels)
+        ax.set_thetagrids(angles * 180 / np.pi, labels, size=self.label['label_size'], color=self.label['label_color'])
 
         # 设置雷达图的0度起始位置
         ax.set_theta_zero_location('N')
@@ -282,16 +314,13 @@ class Plotter():
 
         # 设置雷达图的坐标值显示角度，相对于起始角度的偏移量
         ax.set_rlabel_position(270)
-        ax.set_title("计算机专业大一（上）")
-        plt.legend(["弓长张", "口天吴"], loc='best')
-        plt.tight_layout()
-        ax.tick_params(pad=12, grid_color='k', grid_alpha=0.2, grid_linestyle=(0, (5, 5)))
+        ax.set_title("圆形雷达图", fontsize=self.title['font_size'], color=self.title['font_color'])
+        plt.legend(["弓长张", "口天吴"], loc='best', fontsize=self.legend['leg_size'])
+        # plt.tight_layout()
+        ax.tick_params(pad=20, grid_color='k', grid_alpha=0.2, grid_linestyle=(0, (5, 5)), size=10)
 
         plt.fill(angles, score_a, alpha=0.5)
         plt.fill(angles, score_b, alpha=0.5)
-
-        # plt.fill(angles, score_a, facecolor='green', alpha=0.2)
-        # plt.fill(angles, score_b, facecolor='blue', alpha=0.5)
 
     def polygon_radar(self):
         """
