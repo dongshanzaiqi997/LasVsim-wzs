@@ -39,25 +39,36 @@ class Plotter():
     def plot(self):
         """ 各种图像绘制的具体实现 """
         if self.scheme == '单变量-曲线图':
+            self.prepare_the_canvas()
             self.single_variable_plot()
         elif self.scheme == '单变量-散点图':
+            self.prepare_the_canvas()
             self.single_variable_scatter()
         elif self.scheme == '单变量-直方图':
+            self.prepare_the_canvas()
             self.single_variable_hist()
         elif self.scheme == '相关变量-曲线图':
+            self.prepare_the_canvas()
             self.correlated_variable_plot()
         elif self.scheme == '相关变量-散点图':
+            self.prepare_the_canvas()
             self.correlated_variable_scatter()
         elif self.scheme == '双Y轴-曲线图':
+            self.prepare_the_canvas()
             self.double_y_plot()
         elif self.scheme == '双Y轴-散点图':
+            self.prepare_the_canvas()
             self.double_y_scatter()
         elif self.scheme == '双Y轴-直方图':
             self.double_y_hist()
         elif self.scheme == '圆形雷达图':
+            self.prepare_the_canvas()
             self.circle_radar()
         elif self.scheme == '多边形雷达图':
+            self.prepare_the_canvas()
             self.polygon_radar()
+        elif self.scheme == '多幅子图绘制':
+            self.regular_multiple_subgraph_drawing()
         else:
             return 0
 
@@ -68,9 +79,6 @@ class Plotter():
         """
         x = np.arange(10)
         y = np.random.randn(10)
-
-        # 图像尺寸和dpi设置
-        plt.figure(figsize=self.figsize, dpi=self.dpi)
 
         plt.plot(x, y, label='y')
 
@@ -98,8 +106,6 @@ class Plotter():
         colors = rng.rand(10)  # 产生10个介于[0，1]之间的数值，用于颜色映射的数值
         sizes = 700 * rng.rand(10)  # 用于改变散点面积的数值
 
-        plt.figure(figsize=self.figsize, dpi=self.dpi)
-
         # plt.scatter(x, y, c=colors, s=sizes, alpha=0.3, cmap='viridis')
         plt.scatter(x, y, marker='o', s=sizes, alpha=0.3, cmap='viridis', label='散点图')
         # plt.colorbar()  # 显示颜色条
@@ -123,8 +129,6 @@ class Plotter():
 
         mu, sigma = 100, 15
         x = mu + sigma * np.random.randn(10000)  # 正太分布
-
-        plt.figure(figsize=self.figsize, dpi=self.dpi)
 
         # the histogram of the data
         plt.hist(x, 50, density=True, alpha=0.75, label='正太分布直方图')
@@ -152,9 +156,6 @@ class Plotter():
         x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
         sin_y = np.sin(x)
 
-        # 图像尺寸和dpi设置
-        plt.figure(figsize=self.figsize, dpi=self.dpi)
-
         plt.plot(x, sin_y, label='sin(x)')
 
         # label字号和颜色设置：20
@@ -177,7 +178,6 @@ class Plotter():
         x = np.random.normal(0, 1, size=10000)
         y = np.random.normal(0, 1, size=10000)
 
-        plt.figure(figsize=self.figsize, dpi=self.dpi)
         plt.scatter(x, y, marker='o', alpha=0.1, label='二维正态分布的点')
 
         # plt.scatter(x, y, color=self.color[0], marker='o', alpha=0.1, label='二维正态分布的点')
@@ -199,8 +199,7 @@ class Plotter():
         y1 = np.exp(-x)
         y2 = np.log(x)
 
-        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax1 = fig.add_subplot(111)
+        ax1 = plt.subplot(111)
 
         plt.title('双Y轴-曲线图', fontsize=self.title['font_size'], color=self.title['font_color'])
         plot1 = ax1.plot(x, y1, label='指数函数')
@@ -225,13 +224,12 @@ class Plotter():
         y1 = np.exp(-x)
         y2 = np.log(x)
 
-        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax1 = fig.add_subplot(111)
+        ax1 = plt.subplot(111)
 
         plt.title('双Y轴-散点图', fontsize=self.title['font_size'], color=self.title['font_color'])
         s1 = ax1.scatter(x, y1, label='指数函数')
         ax1.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_c olor'])
+        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
         plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
         plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
 
@@ -254,7 +252,7 @@ class Plotter():
         x2 = mu2 + sigma2 * np.random.randn(10000)  # 正太分布
 
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        ax1 = fig.add_subplot(111)
+        ax1 = plt.subplot(111)
 
         plt.title('双Y轴-直方图', fontsize=self.title['font_size'], color=self.title['font_color'])
         ax1.hist(x1, 50, density=True, alpha=0.75, label='指数函数')
@@ -273,7 +271,7 @@ class Plotter():
                    bbox_transform=ax1.transAxes,
                    fontsize=self.legend['leg_size'])
 
-    def circle_radar(self):
+    def circle_radar(self, ax):
         """
         绘制圆形雷达图
         这是第9个绘图方案
@@ -293,12 +291,7 @@ class Plotter():
         angles = np.concatenate((angles, [angles[0]]))
         labels = np.concatenate((labels, [labels[0]]))
 
-        # 设置图形的大小
-        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-
-        # 新建一个子图
-        # ax = plt.subplot(111, polar=True)
-        ax = fig.add_subplot(111, projection='polar')
+        # ax = plt.subplot(111, polar=True)  # todo:看看怎么解决这行语句问题
 
         # 绘制雷达图
         ax.plot(angles, score_a, "o-")
@@ -334,7 +327,7 @@ class Plotter():
         plt.fill(angles, score_a, alpha=0.5)
         plt.fill(angles, score_b, alpha=0.5)
 
-    def polygon_radar(self):  # todo: 待解决的下一个目标
+    def polygon_radar(self):
         """
         绘制多边形雷达图
         这是第10个绘图方案
@@ -353,8 +346,8 @@ class Plotter():
         angles = np.concatenate((angles, [angles[0]]))
         labels = np.concatenate((labels, [labels[0]]))
 
-        fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        fig.suptitle("多边形雷达图", fontsize=self.title['font_size'], color=self.title['font_color'])
+        plt.suptitle("多边形雷达图", fontsize=self.title['font_size'], color=self.title['font_color'])
+
         ax1 = plt.subplot(121, polar=True)
         ax2 = plt.subplot(122, polar=True)
         ax, data, name = [ax1, ax2], [score_a, score_b], ["弓长张", "口天吴"]
@@ -397,5 +390,39 @@ class Plotter():
 
             # 设置每一个单独的子图的标题（注意：不是整幅图像的标题）
             ax[i].set_title(name[i])
+
+            # 指标标签的属性配置
+            ax[i].tick_params(pad=20, grid_color='k', grid_alpha=0.2, grid_linestyle=(0, (5, 5)), size=10)
         # plt.legend(loc='best', fontsize=self.legend['leg_size'])  # 这种不需要再画图例了
         plt.tight_layout()
+
+    def regular_multiple_subgraph_drawing(self):
+        """ 在同一画布上绘制规则多幅子图 """
+        # 画第1个图：折线图
+        # x = np.arange(1, 100)
+        plt.subplot(221)
+        self.single_variable_plot()  # todo:要进行代码重构，完成类似此处这个函数的调用。即第一步完成代码重构，第二步实现多子图绘制的开发。
+        # plt.plot(x, x * x)
+
+        # 画第2个图：散点图
+        plt.subplot(222)
+        self.single_variable_scatter()
+        # plt.scatter(np.arange(0, 10), np.random.rand(10))
+
+        # 画第3个图：直方图
+        plt.subplot(223)
+        self.single_variable_hist()
+
+        # 画第4个图：雷达图
+        ax = plt.subplot(224, polar=True)
+        self.circle_radar(ax)
+
+        plt.show()
+        # todo:明天上午的任务是：(1)替换成ax的形式；
+        #                    （1）画不规则多子图；
+        #                    （3）子图中属性缩放等；
+        #                    （4）按陈晨说的修改。
+
+    def prepare_the_canvas(self):
+        """ 画布准备 """
+        plt.figure(figsize=self.figsize, dpi=self.dpi)
