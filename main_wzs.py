@@ -45,16 +45,36 @@ def built_parser(scheme):
                                 9: '多边形雷达图',
                                 10: '规则多幅子图绘制',
                                 11: '不规则多幅子图绘制'})
+
+    '''font setting'''
     parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')
+
+    '''figsize setting'''
     parser.add_argument("--figsize", type=dict, default=(12, 8), help='(12, 8) or (8, 8)')
+
+    '''dpi setting'''
     parser.add_argument("--DPI", type=int, default=300, help='300 or 600')
+
+    '''graph setting'''
     parser.add_argument("--graph_color", type=list, default=['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w'])
+
+    '''axes label setting'''
+    parser.add_argument("--xlabel", type=str, default='输入数据 x')
+    parser.add_argument("--ylabel", type=str, default='输出数据 y')
+    parser.add_argument("--y2label", type=str, default='输出数据 y', help='双Y轴右边的y轴标签')
     parser.add_argument("--axes_label_size", type=int, default=20)
     parser.add_argument("--axes_label_color", type=str, default='black')
+
+    '''ticks setting'''
     parser.add_argument("--tick_font", type=str, default='Times New Roman')
     parser.add_argument("--tick_size", type=int, default=15)
+
+    '''title setting'''
+    parser.add_argument("--title", type=str, default='图像标题')
     parser.add_argument("--title_size", type=int, default=25)
     parser.add_argument("--title_color", type=str, default='black')
+
+    '''legend setting'''
     parser.add_argument("--legend_size", type=int, default='15')
     return parser.parse_args()
 
@@ -77,7 +97,7 @@ def main(scheme):
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
     print('--欢迎来到LasVSim的绘图世界！成功！')
-    main(11)
+    main(1)
 
 
 
