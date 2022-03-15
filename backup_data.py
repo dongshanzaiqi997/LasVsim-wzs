@@ -41,3 +41,7 @@
 # [y_tick_label_temp.set_fontname(self.ticks['tick_font']) for y_tick_label_temp in y_tick_label]
 # ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
 
+
+# ########################## 打印matplotlib参数配置文件地址的语句 #################################
+# print(matplotlib.matplotlib_fname())
+

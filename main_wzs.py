@@ -19,17 +19,49 @@
 
 # todo:完善文档。
 # todo:模块开发宗旨：让使用者只修改接口就可完成期待图像的绘制，不需要关注plot模块中的具体代码操作。
-
+from __future__ import print_function
+import argparse
 import os
 from plot_wzs import Plotter
 import plot_config
 from datetime import datetime
 import matplotlib.pyplot as plt
 
+def built_parser(scheme):
+    parser = argparse.ArgumentParser()
+    '''Task'''
+    '''scheme list'''
+    parser.add_argument("--scheme", type=int, default=scheme)
+    parser.add_argument("--scheme_name", type=dict,
+                       default={0: '单变量-曲线图',
+                                1: '单变量-散点图',
+                                2: '单变量-直方图',
+                                3: '相关变量-曲线图',
+                                4: '相关变量-散点图',
+                                5: '双Y轴-曲线图',
+                                6: '双Y轴-散点图',
+                                7: '双Y轴-直方图',
+                                8: '圆形雷达图',
+                                9: '多边形雷达图',
+                                10: '规则多幅子图绘制',
+                                11: '不规则多幅子图绘制'})
+    parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')
+    parser.add_argument("--figsize", type=dict, default=(12, 8), help='(12, 8) or (8, 8)')
+    parser.add_argument("--DPI", type=int, default=300, help='300 or 600')
+    parser.add_argument("--graph_color", type=list, default=['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w'])
+    parser.add_argument("--axes_label_size", type=int, default=20)
+    parser.add_argument("--axes_label_color", type=str, default='black')
+    parser.add_argument("--tick_font", type=str, default='Times New Roman')
+    parser.add_argument("--tick_size", type=int, default=15)
+    parser.add_argument("--title_size", type=int, default=25)
+    parser.add_argument("--title_color", type=str, default='black')
+    parser.add_argument("--legend_size", type=int, default='15')
+    return parser.parse_args()
 
-def main(scheme, font, figsize, dpi, color, label, ticks, title, legend):
+def main(scheme):
     """图像绘制入口"""
-    draw = Plotter(scheme, font, figsize, dpi, color, label, ticks, title, legend)
+    args = built_parser(scheme=scheme)
+    draw = Plotter(args)
     draw.plot()
 
     # 图像保存
@@ -42,21 +74,10 @@ def main(scheme, font, figsize, dpi, color, label, ticks, title, legend):
     plt.savefig(fname=log_dir + '/polygon_radar.svg')
 
 
-
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
     print('--欢迎来到LasVSim的绘图世界！成功！')
-    main(plot_config.SCHEME[11],       # 画图方案
-         plot_config.FONT[0],         # 字体
-         plot_config.FIG_SIZE[0],     # 图像尺寸
-         plot_config.DPI[0],          # 打印分辨率 todo:这种一个的可以直接写在这里
-         plot_config.GRAPH_COLOR,     # 图形颜色
-         plot_config.LABEL,           # 轴标签字号和颜色配置
-         plot_config.TICKS,           # 轴刻度字体和字号配置
-         plot_config.TITLE,           # 图像标题
-         plot_config.LEGEND)          # 图例字号设置  # todo:思考是否可用argparse的方式实现会更简洁和清晰
-
-
+    main(11)
 
 
 

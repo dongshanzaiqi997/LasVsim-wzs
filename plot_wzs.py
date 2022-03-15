@@ -11,65 +11,67 @@ from datetime import datetime
 from cycler import cycler
 
 
-print(matplotlib.matplotlib_fname())
-
 class Plotter():
-    """画图"""
-    def __init__(self, scheme, font, figsize, dpi, color, label, ticks, title, legend):
-        self.scheme = scheme
-        self.font = font
-        self.figsize = figsize
-        self.dpi = dpi
-        self.color = color
-        self.label = label
-        self.ticks = ticks
-        self.title = title
-        self.legend = legend
+    """画图"""  # todo:必须将默认参数设置成不变参数！
+    def __init__(self, args):
+        super(Plotter, self).__init__()
+        self.scheme = args.scheme
+        self.font = args.font
+        self.figsize = args.figsize
+        self.dpi = args.DPI
+        self.color = args.graph_color
+        self.axes_label_size = args.axes_label_size
+        self.axes_label_color = args.axes_label_color
+        self.tick_font = args.tick_font
+        self.tick_size = args.tick_size
+        self.title_size = args.title_size
+        self.title_color = args.title_color
+        self.leg_size = args.legend_size
 
         # 字体及正负号显示设置
         matplotlib.rcParams['font.sans-serif'] = self.font
         matplotlib.rcParams['axes.unicode_minus'] = False  # 解决正负号显示的问题
 
         # 颜色循环设置
-        color_cycler = cycler(color=color)
+        color_cycler = cycler(color=self.color)
         plt.rc('axes', prop_cycle=color_cycler)  # 设置绘图区属性
 
     def plot(self):
         """ 各种图像绘制的具体实现 """
-        if self.scheme == '单变量-曲线图':
+        if self.scheme == 0:
             fig = self.prepare_the_canvas()
             self.single_variable_plot(fig, ax=plt.subplot())
-        elif self.scheme == '单变量-散点图':
+        elif self.scheme == 1:
             fig = self.prepare_the_canvas()
             self.single_variable_scatter(fig, ax=plt.subplot())
-        elif self.scheme == '单变量-直方图':
+        elif self.scheme == 2:
             fig = self.prepare_the_canvas()
             self.single_variable_hist(fig, ax=plt.subplot())
-        elif self.scheme == '相关变量-曲线图':
+        elif self.scheme == 3:
             fig = self.prepare_the_canvas()
             self.correlated_variable_plot(fig, ax=plt.subplot())
-        elif self.scheme == '相关变量-散点图':
+        elif self.scheme == 4:
             fig = self.prepare_the_canvas()
             self.correlated_variable_scatter(fig, ax=plt.subplot())
-        elif self.scheme == '双Y轴-曲线图':
+        elif self.scheme == 5:
             fig = self.prepare_the_canvas()
             self.double_y_plot(fig, ax=plt.subplot())
-        elif self.scheme == '双Y轴-散点图':
+        elif self.scheme == 6:
             fig = self.prepare_the_canvas()
             self.double_y_scatter(fig, ax=plt.subplot())
-        elif self.scheme == '双Y轴-直方图':
+        elif self.scheme == 7:
             fig = self.prepare_the_canvas()
             self.double_y_hist(fig, ax=plt.subplot())
-        elif self.scheme == '圆形雷达图':
+        elif self.scheme == 8:
             fig = self.prepare_the_canvas()
             self.circle_radar(fig, ax=plt.subplot(polar=True))
-        elif self.scheme == '多边形雷达图':
+        elif self.scheme == 9:
             fig = self.prepare_the_canvas()
             self.polygon_radar(fig, ax=plt.subplot(polar=True))
-        elif self.scheme == '规则多幅子图绘制':
+        elif self.scheme == 10:
             fig = self.prepare_the_canvas()
             self.regular_multiple_subgraph_drawing(fig, ax=plt.subplot())
-        elif self.scheme == '不规则多幅子图绘制':
+        elif self.scheme == 11:
             fig = self.prepare_the_canvas()
             self.irregular_multiple_subgraph_drawing(fig, ax=plt.subplot())
         else:
@@ -79,7 +81,8 @@ class Plotter():
         #                    （2）画不规则多子图；
         #                    （3）子图中属性缩放等；
         #                    （4）按陈晨说的修改；
-        #                    （5）将数据接口改好。
+        #                     (5)函数重构
+        #                    （6）将数据接口改好。
 
     def single_variable_plot(self, fig, ax):
         """
@@ -92,21 +95,22 @@ class Plotter():
         ax.plot(x, y, label='y')
 
         # label字号和颜色设置：20
-        ax.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax.set_ylabel('输出数据 y', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax.set_xlabel('输入数据 x', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax.set_ylabel('输出数据 y', fontsize=self.axes_label_size, color=self.axes_label_color)
 
         # 刻度字体和字号设置
         x_tick_label = ax.get_xticklabels()
-        [x_tick_label_temp.set_fontname(self.ticks['tick_font']) for x_tick_label_temp in x_tick_label]
-        ax.tick_params(axis='x', labelsize=self.ticks['tick_size'])
+        [x_tick_label_temp.set_fontname(self.tick_font) for x_tick_label_temp in x_tick_label]
+        ax.tick_params(axis='x', labelsize=self.tick_size)
 
         y_tick_label = ax.get_yticklabels()
-        [y_tick_label_temp.set_fontname(self.ticks['tick_font']) for y_tick_label_temp in y_tick_label]
-        ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y_tick_label_temp.set_fontname(self.tick_font) for y_tick_label_temp in y_tick_label]
+        ax.tick_params(axis='y', labelsize=self.tick_size)
 
         # title字号和颜色设置
-        ax.set_title('单变量-曲线图', fontsize=self.title['font_size'], color=self.title['font_color'])
-        ax.legend(fontsize=self.legend['leg_size'], loc='best')
+        ax.set_title('单变量-曲线图', fontsize=self.title_size, color=self.title_color)
+        ax.legend(fontsize=self.leg_size, loc='best')
+        # plt.show()
 
     def single_variable_scatter(self, fig, ax):
         """
@@ -124,21 +128,21 @@ class Plotter():
         ax.scatter(x, y, marker='o', s=sizes, alpha=0.3, cmap='viridis', label='散点图')
         # plt.colorbar()  # 显示颜色条
 
-        ax.set_title('单变量-散点图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        ax.set_title('单变量-散点图', fontsize=self.title_size, color=self.title_color)
 
-        ax.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax.set_ylabel('随机数据 y', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax.set_xlabel('输入数据 x', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax.set_ylabel('输出数据 y', fontsize=self.axes_label_size, color=self.axes_label_color)
 
         # 刻度字体和字号设置
         x_tick_label = ax.get_xticklabels()
-        [x_tick_label_temp.set_fontname(self.ticks['tick_font']) for x_tick_label_temp in x_tick_label]
-        ax.tick_params(axis='x', labelsize=self.ticks['tick_size'])
+        [x_tick_label_temp.set_fontname(self.tick_font) for x_tick_label_temp in x_tick_label]
+        ax.tick_params(axis='x', labelsize=self.tick_size)
 
         y_tick_label = ax.get_yticklabels()
-        [y_tick_label_temp.set_fontname(self.ticks['tick_font']) for y_tick_label_temp in y_tick_label]
-        ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y_tick_label_temp.set_fontname(self.tick_font) for y_tick_label_temp in y_tick_label]
+        ax.tick_params(axis='y', labelsize=self.tick_size)
 
-        ax.legend(fontsize=self.legend['leg_size'], loc='best')
+        ax.legend(fontsize=self.leg_size, loc='best')
 
     def single_variable_hist(self, fig, ax):
         """
@@ -153,9 +157,9 @@ class Plotter():
         # the histogram of the data
         ax.hist(x, 50, density=True, alpha=0.75, label='正太分布直方图')
 
-        ax.set_xlabel('Smarts', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax.set_ylabel('Probability', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax.set_title('Histogram of IQ', fontsize=self.title['font_size'], color=self.title['font_color'])
+        ax.set_xlabel('Smarts', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax.set_ylabel('Probability', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax.set_title('Histogram of IQ', fontsize=self.title_size, color=self.title_color)
 
         # r是指定它后面的字符串是原始的字符串，然后用$包裹表示中间的是数学表达式，\表示转译具体的数学符号。
         ax.text(60, .025, r'$\mu=100,\ \sigma=15$')
@@ -164,14 +168,14 @@ class Plotter():
 
         # 刻度字体和字号设置
         x_tick_label = ax.get_xticklabels()
-        [x_tick_label_temp.set_fontname(self.ticks['tick_font']) for x_tick_label_temp in x_tick_label]
-        ax.tick_params(axis='x', labelsize=self.ticks['tick_size'])
+        [x_tick_label_temp.set_fontname(self.tick_font) for x_tick_label_temp in x_tick_label]
+        ax.tick_params(axis='x', labelsize=self.tick_size)
 
         y_tick_label = ax.get_yticklabels()
-        [y_tick_label_temp.set_fontname(self.ticks['tick_font']) for y_tick_label_temp in y_tick_label]
-        ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y_tick_label_temp.set_fontname(self.tick_font) for y_tick_label_temp in y_tick_label]
+        ax.tick_params(axis='y', labelsize=self.tick_size)
 
-        ax.legend(fontsize=self.legend['leg_size'], loc='best')
+        ax.legend(fontsize=self.leg_size, loc='best')
         ax.grid(True)
 
     def correlated_variable_plot(self, fig, ax):
@@ -185,21 +189,21 @@ class Plotter():
         ax.plot(x, sin_y, label='sin(x)')
 
         # label字号和颜色设置：20
-        ax.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax.set_ylabel('sin(x)', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax.set_xlabel('输入数据 x', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax.set_ylabel('sin(x)', fontsize=self.axes_label_size, color=self.axes_label_color)
 
         # 刻度字体和字号设置
         x_tick_label = ax.get_xticklabels()
-        [x_tick_label_temp.set_fontname(self.ticks['tick_font']) for x_tick_label_temp in x_tick_label]
-        ax.tick_params(axis='x', labelsize=self.ticks['tick_size'])
+        [x_tick_label_temp.set_fontname(self.tick_font) for x_tick_label_temp in x_tick_label]
+        ax.tick_params(axis='x', labelsize=self.tick_size)
 
         y_tick_label = ax.get_yticklabels()
-        [y_tick_label_temp.set_fontname(self.ticks['tick_font']) for y_tick_label_temp in y_tick_label]
-        ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y_tick_label_temp.set_fontname(self.tick_font) for y_tick_label_temp in y_tick_label]
+        ax.tick_params(axis='y', labelsize=self.tick_size)
 
         # title字号和颜色设置
-        ax.set_title('相关变量曲线图', fontsize=self.title['font_size'], color=self.title['font_color'])
-        ax.legend(fontsize=self.legend['leg_size'], loc='best')
+        ax.set_title('相关变量曲线图', fontsize=self.title_size, color=self.title_color)
+        ax.legend(fontsize=self.leg_size, loc='best')
 
     def correlated_variable_scatter(self, fig, ax):
         """
@@ -213,17 +217,17 @@ class Plotter():
 
         # 刻度字体和字号设置
         x_tick_label = ax.get_xticklabels()
-        [x_tick_label_temp.set_fontname(self.ticks['tick_font']) for x_tick_label_temp in x_tick_label]
-        ax.tick_params(axis='x', labelsize=self.ticks['tick_size'])
+        [x_tick_label_temp.set_fontname(self.tick_font) for x_tick_label_temp in x_tick_label]
+        ax.tick_params(axis='x', labelsize=self.tick_size)
 
         y_tick_label = ax.get_yticklabels()
-        [y_tick_label_temp.set_fontname(self.ticks['tick_font']) for y_tick_label_temp in y_tick_label]
-        ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y_tick_label_temp.set_fontname(self.tick_font) for y_tick_label_temp in y_tick_label]
+        ax.tick_params(axis='y', labelsize=self.tick_size)
 
-        ax.set_title('相关变量-散点图', fontsize=self.title['font_size'], color=self.title['font_color'])
-        ax.set_xlabel('正太分布 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax.set_ylabel('正态分布 y', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax.legend(fontsize=self.legend['leg_size'], loc='best')
+        ax.set_title('相关变量-散点图', fontsize=self.title_size, color=self.title_color)
+        ax.set_xlabel('正太分布 x', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax.set_ylabel('正态分布 y', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax.legend(fontsize=self.leg_size, loc='best')
 
     def double_y_plot(self, fig, ax):
         """
@@ -236,30 +240,30 @@ class Plotter():
 
         ax1 = ax
 
-        ax1.set_title('双Y轴-曲线图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        ax1.set_title('双Y轴-曲线图', fontsize=self.title_size, color=self.title_color)
         plot1 = ax1.plot(x, y1, label='指数函数')
-        ax1.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax1.set_xlabel('输入数据 x', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax1.set_ylabel('指数函数', fontsize=self.axes_label_size, color=self.axes_label_color)
 
         # 刻度字体和字号设置
         x_tick_label = ax1.get_xticklabels()
-        [x_tick_label_temp.set_fontname(self.ticks['tick_font']) for x_tick_label_temp in x_tick_label]
-        ax1.tick_params(axis='x', labelsize=self.ticks['tick_size'])
+        [x_tick_label_temp.set_fontname(self.tick_font) for x_tick_label_temp in x_tick_label]
+        ax1.tick_params(axis='x', labelsize=self.tick_size)
 
         y1_tick_label = ax1.get_yticklabels()
-        [y1_tick_label_temp.set_fontname(self.ticks['tick_font']) for y1_tick_label_temp in y1_tick_label]
-        ax1.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y1_tick_label_temp.set_fontname(self.tick_font) for y1_tick_label_temp in y1_tick_label]
+        ax1.tick_params(axis='y', labelsize=self.tick_size)
 
         ax2 = ax1.twinx()
         plot2 = ax2.plot(x, y2, 'fuchsia', label='对数函数')
-        ax2.set_ylabel('对数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax2.set_ylabel('对数函数', fontsize=self.axes_label_size, color=self.axes_label_color)
 
         y2_tick_label = ax2.get_yticklabels()
-        [y2_tick_label_temp.set_fontname(self.ticks['tick_font']) for y2_tick_label_temp in y2_tick_label]
-        ax2.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y2_tick_label_temp.set_fontname(self.tick_font) for y2_tick_label_temp in y2_tick_label]
+        ax2.tick_params(axis='y', labelsize=self.tick_size)
 
         lines = plot1 + plot2
-        ax1.legend(lines, [l.get_label() for l in lines], fontsize=self.legend['leg_size'], loc='best')
+        ax1.legend(lines, [l.get_label() for l in lines], fontsize=self.leg_size, loc='best')
 
     def double_y_scatter(self, fig, ax):
         """
@@ -272,31 +276,31 @@ class Plotter():
 
         ax1 = ax
 
-        ax1.set_title('双Y轴-散点图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        ax1.set_title('双Y轴-散点图', fontsize=self.title_size, color=self.title_color)
         s1 = ax1.scatter(x, y1, label='指数函数')
-        ax1.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax1.set_xlabel('输入数据 x', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax1.set_ylabel('指数函数', fontsize=self.axes_label_size, color=self.axes_label_color)
 
         # 刻度字体和字号设置
         x_tick_label = ax1.get_xticklabels()
-        [x_tick_label_temp.set_fontname(self.ticks['tick_font']) for x_tick_label_temp in x_tick_label]
-        ax1.tick_params(axis='x', labelsize=self.ticks['tick_size'])
+        [x_tick_label_temp.set_fontname(self.tick_font) for x_tick_label_temp in x_tick_label]
+        ax1.tick_params(axis='x', labelsize=self.tick_size)
 
         y1_tick_label = ax1.get_yticklabels()
-        [y1_tick_label_temp.set_fontname(self.ticks['tick_font']) for y1_tick_label_temp in y1_tick_label]
-        ax1.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y1_tick_label_temp.set_fontname(self.tick_font) for y1_tick_label_temp in y1_tick_label]
+        ax1.tick_params(axis='y', labelsize=self.tick_size)
 
         # 利用方法x.twinx()在原来坐标轴上建立第二个坐标轴
         ax2 = ax1.twinx()
         s2 = ax2.scatter(x, y2, c='fuchsia', label='对数函数')
-        ax2.set_ylabel('对数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
+        ax2.set_ylabel('对数函数', fontsize=self.axes_label_size, color=self.axes_label_color)
 
         # 第二个y轴的设置
         y2_tick_label = ax2.get_yticklabels()
-        [y2_tick_label_temp.set_fontname(self.ticks['tick_font']) for y2_tick_label_temp in y2_tick_label]
-        ax2.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [y2_tick_label_temp.set_fontname(self.tick_font) for y2_tick_label_temp in y2_tick_label]
+        ax2.tick_params(axis='y', labelsize=self.tick_size)
 
-        ax.legend(handles=[s1, s2], fontsize=self.legend['leg_size'], loc='best')
+        ax.legend(handles=[s1, s2], fontsize=self.leg_size, loc='best')
 
     def double_y_hist(self, fig, ax):
         """
@@ -313,21 +317,21 @@ class Plotter():
         ax1 = ax
 
 
-        plt.title('双Y轴-直方图', fontsize=self.title['font_size'], color=self.title['font_color'])
+        plt.title('双Y轴-直方图', fontsize=self.title_size, color=self.title_color)
         ax1.hist(x1, 50, density=True, alpha=0.75, label='指数函数')
-        ax1.set_xlabel('输入数据 x', fontsize=self.label['label_size'], color=self.label['label_color'])
-        ax1.set_ylabel('指数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
-        plt.xticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
-        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        ax1.set_xlabel('输入数据 x', fontsize=self.axes_label_size, color=self.axes_label_color)
+        ax1.set_ylabel('指数函数', fontsize=self.axes_label_size, color=self.axes_label_color)
+        plt.xticks(fontproperties=self.tick_font, size=self.tick_size)
+        plt.yticks(fontproperties=self.tick_font, size=self.tick_size)
         ax2 = ax1.twinx()
         ax2.hist(x2, 50, density=True, alpha=0.75, color='fuchsia', label='对数函数')
-        ax2.set_ylabel('对数函数', fontsize=self.label['label_size'], color=self.label['label_color'])
-        plt.yticks(fontproperties=self.ticks['tick_font'], size=self.ticks['tick_size'])
+        ax2.set_ylabel('对数函数', fontsize=self.axes_label_size, color=self.axes_label_color)
+        plt.yticks(fontproperties=self.tick_font, size=self.tick_size)
 
         fig.legend(loc='upper right',
                    bbox_to_anchor=(1, 1),
                    bbox_transform=ax1.transAxes,
-                   fontsize=self.legend['leg_size'])
+                   fontsize=self.leg_size)
 
     def circle_radar(self, fig, ax):
         """
@@ -354,7 +358,7 @@ class Plotter():
         ax.plot(angles, score_b, "o-")
 
         # 设置雷达图中每一项的标签显示
-        ax.set_thetagrids(angles * 180 / np.pi, labels, size=self.label['label_size'], color=self.label['label_color'])
+        ax.set_thetagrids(angles * 180 / np.pi, labels, size=self.axes_label_size, color=self.axes_label_color)
 
         # 设置雷达图的0度起始位置
         ax.set_theta_zero_location('N')
@@ -365,13 +369,13 @@ class Plotter():
         # 极径网格线和标签显示(这个方法类似plt.yticks())
         ax.set_rgrids(np.arange(0, 120, 20),
                       labels=np.arange(0, 120, 20),
-                      fontproperties=self.ticks['tick_font'],
-                      size=self.ticks['tick_size'])
+                      fontproperties=self.tick_font,
+                      size=self.tick_size)
 
         # 设置雷达图的坐标值显示角度，相对于起始角度的偏移量
         ax.set_rlabel_position(270)
-        ax.set_title("圆形雷达图", fontsize=self.title['font_size'], color=self.title['font_color'])
-        ax.legend(["弓长张", "口天吴"], loc='best', fontsize=self.legend['leg_size'])
+        ax.set_title("圆形雷达图", fontsize=self.title_size, color=self.title_color)
+        ax.legend(["弓长张", "口天吴"], loc='best', fontsize=self.leg_size)
 
         # 图像在画布上充分填充
         # plt.tight_layout()
@@ -402,7 +406,7 @@ class Plotter():
         angles = np.concatenate((angles, [angles[0]]))
         labels = np.concatenate((labels, [labels[0]]))
 
-        ax.set_title("多边形雷达图", fontsize=self.title['font_size'], color=self.title['font_color'])
+        ax.set_title("多边形雷达图", fontsize=self.title_size, color=self.title_color)
 
         # 下面的两个for循环的作用是画雷达底图
         for j in np.arange(0, 100 + 20, 20):  # 画圆
@@ -424,8 +428,8 @@ class Plotter():
             ax.text(a, b + 5, '%.00f' % b, ha='right', va='top', fontsize=15, color='b')
             ax.text(a, c + 5, '%.00f' % c, ha='right', va='top', fontsize=15, color='g')
 
-        ax.set_thetagrids(angles * 180 / np.pi, labels, size=self.label['label_size'],
-                             color=self.label['label_color'])
+        ax.set_thetagrids(angles * 180 / np.pi, labels, size=self.axes_label_size,
+                             color=self.axes_label_color)
 
         # 设置极坐标零度朝向
         ax.set_theta_zero_location('N')
@@ -435,8 +439,8 @@ class Plotter():
 
         # 极径标签的字体和字号设置
         r_tick_label = ax.get_yticklabels()
-        [r_tick_label_temp.set_fontname(self.ticks['tick_font']) for r_tick_label_temp in r_tick_label]
-        ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+        [r_tick_label_temp.set_fontname(self.tick_font) for r_tick_label_temp in r_tick_label]
+        ax.tick_params(axis='y', labelsize=self.tick_size)
 
         # 极径标签的角度（相对极坐标的初始零度）位置
         ax.set_rlabel_position(358)
@@ -444,7 +448,7 @@ class Plotter():
         # 指标标签的属性配置
         ax.tick_params(pad=10, grid_color='k', grid_alpha=0.2, grid_linestyle=(0, (5, 5)), size=10)
 
-        ax.legend(loc='best', fontsize=self.legend['leg_size'])
+        ax.legend(loc='best', fontsize=self.leg_size)
 
         # 雷达图的填充
         ax.fill(angles, score_a, alpha=0.5)
