@@ -41,4 +41,4 @@ TICKS = {'tick_font': 'Times New Roman', 'tick_size': 15}
 TITLE = {'font_size': 25, 'font_color': 'black'}
 
 # 图例字号设置
-LEGEND = {'leg_size': 20}
+LEGEND = {'leg_size': 15}

@@ -28,3 +28,16 @@
 # plt.subplot(224)
 # plt.bar([20, 10, 30, 25, 15], [25, 15, 35, 30, 20], color='b')
 
+
+# ########################## 以下两种方法都可以实现雷达图极径标签的字体和字号设置 #################################
+# # 极径网格线和标签显示(这个方法类似plt.yticks())
+# ax.set_rgrids(np.arange(0, 120, 20),
+#                  labels=np.arange(0, 120, 20),
+#                  fontproperties=self.ticks['tick_font'],
+#                  size=self.ticks['tick_size'])
+
+# 极径标签的字体和字号设置
+# y_tick_label = ax.get_yticklabels()
+# [y_tick_label_temp.set_fontname(self.ticks['tick_font']) for y_tick_label_temp in y_tick_label]
+# ax.tick_params(axis='y', labelsize=self.ticks['tick_size'])
+
