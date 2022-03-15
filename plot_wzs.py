@@ -9,8 +9,6 @@ import numpy as np
 import matplotlib
 from datetime import datetime
 from cycler import cycler
-# import pandas
-# import constants as cst
 
 
 print(matplotlib.matplotlib_fname())
@@ -68,14 +66,17 @@ class Plotter():
         elif self.scheme == '多边形雷达图':
             fig = self.prepare_the_canvas()
             self.polygon_radar(fig, ax=plt.subplot(polar=True))
-        elif self.scheme == '多幅子图绘制':
+        elif self.scheme == '规则多幅子图绘制':
             fig = self.prepare_the_canvas()
             self.regular_multiple_subgraph_drawing(fig, ax=plt.subplot())
+        elif self.scheme == '不规则多幅子图绘制':
+            fig = self.prepare_the_canvas()
+            self.irregular_multiple_subgraph_drawing(fig, ax=plt.subplot())
         else:
             return 0
 
         # todo:今天下午的任务是：(1)替换成ax的形式；
-        #                    （1）画不规则多子图；
+        #                    （2）画不规则多子图；
         #                    （3）子图中属性缩放等；
         #                    （4）按陈晨说的修改；
         #                    （5）将数据接口改好。
@@ -470,6 +471,25 @@ class Plotter():
         # 画第4个图：雷达图
         ax4 = plt.subplot(224, polar=True)
         self.circle_radar(fig, ax4)
+        plt.tight_layout()
+
+    def irregular_multiple_subgraph_drawing(self, fig, ax):
+        """ 在同一画布上绘制不规则的多幅子图 """
+        # x = np.arange(1, 100)
+
+        # 画第1个图：直方图
+        ax1 = plt.subplot(211)
+        self.double_y_hist(fig, ax1)
+
+        # 画第2个图：散点图
+        ax2 = plt.subplot(223)
+        self.single_variable_scatter(fig, ax2)
+
+        # 画第3个图：雷达图
+        ax3 = plt.subplot(224, polar=True)
+        self.polygon_radar(fig, ax3)
+        # 第一个图占了211的位置，如果想在下面放两个图，得把第二行当成2列，剩下的两个图像将占据223和224的位置
+
         plt.tight_layout()
 
     def prepare_the_canvas(self):
