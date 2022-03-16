@@ -3,18 +3,9 @@
 时间：2022.03.08
 作者：TsingHua-iDLab-王左帅
 """
-# todo: 今天下午的任务：形成完善的整体框架（主要是处理好关于参数的接口问题）。
-#                    具体包括：
-#                    （1）确定matplotlib提供的图形颜色种类；
-#                    （2）确定matplotlib他的字体种类；
-#                    （3）阅读海桐的画图代码，了解其画图思想和实现手段；
-#                    （4）画直方图；
-#                    （5）画雷达图；
-#                    （6）将昨天开会的要求实现；
-#                           下一步的目标是想想有没有更好的实现方法。
-#                           再下一个目标是将其它图像以及还没有实现的图像完整的做好
-#                    （7）画动态图像；
-#                    （8）根据李老师的指导方针完善本模块的功能。
+# todo:
+#                    （1）画动态图像；
+#                    （2）根据李老师的指导方针完善本模块的功能。
 
 
 # todo:完善文档。
@@ -43,14 +34,14 @@ def built_parser(scheme):
                                 7: '双Y轴-直方图',
                                 8: '圆形雷达图',
                                 9: '多边形雷达图',
-                                10: '规则多幅子图绘制',
-                                11: '不规则多幅子图绘制'})
+                                10: '规则型多子图绘制',
+                                11: '不规则型多子图绘制'})
 
     '''font setting'''
     parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')
 
     '''figsize setting'''
-    parser.add_argument("--figsize", type=dict, default=(12, 8), help='(12, 8) or (8, 8)')
+    parser.add_argument("--figsize", type=dict, default=(8, 6), help='(12, 7) or (8, 8)')
 
     '''dpi setting'''
     parser.add_argument("--DPI", type=int, default=300, help='300 or 600')
@@ -97,7 +88,7 @@ def main(scheme):
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
     print('--欢迎来到LasVSim的绘图世界！成功！')
-    main(1)
+    main(9)
 
 
 

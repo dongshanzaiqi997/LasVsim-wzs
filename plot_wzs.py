@@ -9,10 +9,20 @@ import numpy as np
 import matplotlib
 from datetime import datetime
 from cycler import cycler
+import csv
 
 
-class Plotter():
-    """画图"""  # todo:必须将默认参数设置成不变参数！
+# todo:任务(1)细节参数argparse（暂放）；
+#                    （2）函数重构（暂放）；
+#                    （3）数据接口；
+#                          （a）第一步先熟悉数据格式;
+#                           (b)然后利用数据。
+#                    （4）；
+#                     (5)；
+#                    （6）。
+
+class Plotter(object):
+    """画图"""
     def __init__(self, args):
         super(Plotter, self).__init__()
         self.scheme = args.scheme
@@ -81,22 +91,31 @@ class Plotter():
         else:
             return 0
 
-        # todo:任务(1)细节参数argparse；
-        #                    （2）函数重构；
-        #                    （3）数据接口；
-        #                    （4）；
-        #                     (5)；
-        #                    （6）。
-
-    def single_variable_plot(self, fig, ax):
+    def single_variable_plot(self, fig, ax):  # todo:通过这个函数实现数据的获取（1）
         """
         绘制单变量-曲线图
         这是第1个绘图方案
         """
-        x = np.arange(10)
-        y = np.random.randn(10)
+        ## 从CSV文件加载数据 todo:阅读python文件那部分知识；（2）解决白图像标签显示问题
+        # 定义两个空列表
+        # x = []
+        # y = []
+        #
+        # # 打开文件
+        # with open('test_wzs.csv', 'r') as csvfile:
+        #     data = csv.reader(csvfile, delimiter=',')
+        #     for row in data:
+        #         x.append(row[0])  # 将第一类数据添加到x列表
+        #         y.append(row[1])  # 将第二列数据加载到y列表
 
-        ax.plot(x, y, label='y')
+
+
+        x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
+        y1 = np.sin(x)
+        y2 = np.cos(x)
+
+        ax.plot(x, y1, label='曲线1')
+        ax.plot(x, y2, label='曲线2')
 
         # label字号和颜色设置：20
         ax.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)
@@ -188,9 +207,9 @@ class Plotter():
         这是第4个绘图方案
         """
         x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
-        sin_y = np.sin(x)
+        y = np.exp(x)
 
-        ax.plot(x, sin_y, label='sin(x)')
+        ax.plot(x, y, label='exp(x)')
 
         # label字号和颜色设置：20
         ax.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)
@@ -274,14 +293,15 @@ class Plotter():
         绘制‘双Y轴-散点图’
         这是第7个绘图方案
         """
-        x = np.arange(0.1, np.e, 0.1)
-        y1 = np.exp(-x)
-        y2 = np.log(x)
+        N = 10
+        x = np.random.rand(N)
+        y1 = np.random.rand(N)
+        y2 = np.random.rand(N)
 
         ax1 = ax
 
         ax1.set_title(self.title, fontsize=self.title_size, color=self.title_color)
-        s1 = ax1.scatter(x, y1, label='指数函数')
+        s1 = ax1.scatter(x, y1, label='散点1')
         ax1.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         ax1.set_ylabel(self.ylabel, fontsize=self.axes_label_size, color=self.axes_label_color)
 
@@ -296,7 +316,7 @@ class Plotter():
 
         # 利用方法x.twinx()在原来坐标轴上建立第二个坐标轴
         ax2 = ax1.twinx()
-        s2 = ax2.scatter(x, y2, c='fuchsia', label='对数函数')
+        s2 = ax2.scatter(x, y2, c='fuchsia', label='散点2')
         ax2.set_ylabel(self.y2label, fontsize=self.axes_label_size, color=self.axes_label_color)
 
         # 第二个y轴的设置
@@ -316,19 +336,17 @@ class Plotter():
         x1 = mu1 + sigma1 * np.random.randn(10000)  # 正太分布
         x2 = mu2 + sigma2 * np.random.randn(10000)  # 正太分布
 
-        # fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        # ax1 = plt.subplot()
         ax1 = ax
 
 
         plt.title(self.title, fontsize=self.title_size, color=self.title_color)
-        ax1.hist(x1, 50, density=True, alpha=0.75, label='指数函数')
+        ax1.hist(x1, 50, density=True, alpha=0.75, label='直方图1')
         ax1.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         ax1.set_ylabel(self.ylabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         plt.xticks(fontproperties=self.tick_font, size=self.tick_size)
         plt.yticks(fontproperties=self.tick_font, size=self.tick_size)
         ax2 = ax1.twinx()
-        ax2.hist(x2, 50, density=True, alpha=0.75, color='fuchsia', label='对数函数')
+        ax2.hist(x2, 50, density=True, alpha=0.75, color='fuchsia', label='直方图2')
         ax2.set_ylabel(self.y2label, fontsize=self.axes_label_size, color=self.axes_label_color)
         plt.yticks(fontproperties=self.tick_font, size=self.tick_size)
 
@@ -342,8 +360,8 @@ class Plotter():
         绘制圆形雷达图
         这是第9个绘图方案
         """
-        results = [{"大学英语": 87, "高等数学": 79, "体育": 95, "计算机基础": 92, "程序设计": 85},
-                   {"大学英语": 80, "高等数学": 99, "体育": 81, "计算机基础": 85, "程序设计": 61}]
+        results = [{"安全性": 87, "合规性": 79, "舒适性": 95, "效率性": 92, "节能性": 85},
+                   {"安全性": 80, "合规性": 99, "舒适性": 81, "效率性": 85, "节能性": 61}]
         data_length = len(results[0])
 
         # 将极坐标根据数据长度进行等分
@@ -379,7 +397,7 @@ class Plotter():
         # 设置雷达图的坐标值显示角度，相对于起始角度的偏移量
         ax.set_rlabel_position(270)
         ax.set_title(self.title, fontsize=self.title_size, color=self.title_color)
-        ax.legend(["弓长张", "口天吴"], loc='best', fontsize=self.leg_size)
+        ax.legend(["算法1", "算法2"], loc='best', fontsize=self.leg_size)
 
         # 图像在画布上充分填充
         # plt.tight_layout()
@@ -390,14 +408,15 @@ class Plotter():
         # 雷达图的填充
         ax.fill(angles, score_a, alpha=0.5)
         ax.fill(angles, score_b, alpha=0.5)
+        plt.tight_layout()
 
     def polygon_radar(self, fig, ax):
         """
         绘制多边形雷达图
         这是第10个绘图方案
         """
-        results = [{"大学英语": 87, "高等数学": 79, "体育": 95, "计算机基础": 92, "程序设计": 85},
-                   {"大学英语": 80, "高等数学": 90, "体育": 91, "计算机基础": 85, "程序设计": 88}]
+        results = [{"安全性": 87, "合规性": 79, "舒适性": 95, "效率性": 92, "节能性": 85},
+                   {"安全性": 80, "合规性": 90, "舒适性": 91, "效率性": 85, "节能性": 88}]
         data_length = len(results[0])
         angles = np.linspace(0, 2 * np.pi, data_length, endpoint=False)
 
@@ -419,8 +438,8 @@ class Plotter():
             ax.plot([angles[j], angles[j]], [0, 100], '-.', lw=0.5, color='black')
 
         # 开始在雷达地图上绘制图形
-        ax.plot(angles, score_a, label='学生（一）')
-        ax.plot(angles, score_b, label='学生（二）')
+        ax.plot(angles, score_a, label='算法（一）')
+        ax.plot(angles, score_b, label='算法（二）')
 
         # 隐藏最外圈的圆
         ax.spines['polar'].set_visible(False)
