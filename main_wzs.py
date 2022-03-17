@@ -37,6 +37,15 @@ def built_parser(scheme):
                                 10: '规则型多子图绘制',
                                 11: '不规则型多子图绘制'})
 
+    '''file setting'''
+    parser.add_argument("--filename", type=str, default='test_wzs.csv')
+
+    '''data setting'''
+    parser.add_argument("--x_data", type=str, default='time',
+                        help='You can change the name of the data whatever you need.')
+    parser.add_argument("--y_data", type=str, default='x',
+                        help='You can change the name of the data whatever you need.')
+
     '''font setting'''
     parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')
 

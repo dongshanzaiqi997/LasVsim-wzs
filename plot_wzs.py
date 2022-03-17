@@ -28,6 +28,9 @@ class Plotter(object):
     def __init__(self, args):
         super(Plotter, self).__init__()
         self.scheme = args.scheme
+        self.filename = args.filename
+        self.x = args.x_data
+        self.y = args.y_data
         self.font = args.font
         self.figsize = args.figsize
         self.dpi = args.DPI
@@ -95,38 +98,14 @@ class Plotter(object):
 
     # todo:上午完成通过这个函数实现数据获取接口的开发
     #      下午完成所有函数的接口开发。
+    #      写接口
     def single_variable_plot(self, fig, ax):
         """
         绘制单变量-曲线图
         这是第1个绘图方案
         """
-        x = []
-        y = []
-        # todo:用切片实现中间一段数据的获取
-        filename = 'test_wzs.csv'
-        try:
-            with open(filename) as csvfile:
-                data = csv.reader(csvfile, delimiter=',')  # data是一个生成器
-                # 读取第一行表头
-                head = next(data)
-                try:
-                    if 'time' in head:
-                        index_x = head.index('time')
-                    if 'x' in head:
-                        index_y = head.index('x')
-                    for column in data:
-                        # 判断某一列的数据类型
-                        data_type_x = type(eval(column[index_x]))
-                        data_type_y = type(eval(column[index_y]))
-
-                        # todo：如果是list，则下面一段代码要根据需要进行调整
-                        x.append(data_type_x(column[index_x]))
-                        y.append(data_type_y(column[index_y]))
-                except UnboundLocalError:
-                    print('请检查您输入的变量名是否正确！')
-        except FileNotFoundError:
-            msg = "Sorry, the file " + filename + " does not exist."
-            print(msg)
+        # 数据x、 y
+        x, y = self.get_data()
 
         # 开始画图
         ax.plot(x, y, label='曲线1')
@@ -537,3 +516,36 @@ class Plotter(object):
         """ 画布准备 """
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         return fig
+
+    def get_data(self):
+        """文件加载和获取"""
+        x = []
+        y = []
+        # todo:用切片实现中间一段数据的获取
+        filename = self.filename
+        try:
+            with open(filename) as csvfile:
+                data = csv.reader(csvfile, delimiter=',')  # data是一个生成器
+                # 读取第一行表头
+                head = next(data)
+                try:
+                    if self.x in head:
+                        index_x = head.index(self.x)
+                    if self.y in head:
+                        index_y = head.index(self.y)
+                    for column in data:
+                        # 判断某一列的数据类型
+                        data_type_x = type(eval(column[index_x]))
+                        data_type_y = type(eval(column[index_y]))
+
+                        # todo：如果是list，则下面一段代码要根据需要进行调整
+                        x.append(data_type_x(column[index_x]))
+                        y.append(data_type_y(column[index_y]))
+                except UnboundLocalError:
+                    print('请检查您输入的变量名是否正确！')
+        except FileNotFoundError:
+            msg = "Sorry, the file " + filename + " does not exist."
+            print(msg)
+
+        return x, y
+
