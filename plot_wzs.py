@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
 from datetime import datetime
+
+import pandas
 from cycler import cycler
 import csv
 
@@ -91,31 +93,43 @@ class Plotter(object):
         else:
             return 0
 
-    def single_variable_plot(self, fig, ax):  # todo:通过这个函数实现数据的获取（1）
+    # todo:上午完成通过这个函数实现数据获取接口的开发
+    #      下午完成所有函数的接口开发。
+    def single_variable_plot(self, fig, ax):
         """
         绘制单变量-曲线图
         这是第1个绘图方案
         """
-        ## 从CSV文件加载数据 todo:阅读python文件那部分知识；（2）解决白图像标签显示问题
-        # 定义两个空列表
-        # x = []
-        # y = []
-        #
-        # # 打开文件
-        # with open('test_wzs.csv', 'r') as csvfile:
-        #     data = csv.reader(csvfile, delimiter=',')
-        #     for row in data:
-        #         x.append(row[0])  # 将第一类数据添加到x列表
-        #         y.append(row[1])  # 将第二列数据加载到y列表
+        x = []
+        y = []
+        # todo:用切片实现中间一段数据的获取
+        filename = 'test_wzs.csv'
+        try:
+            with open(filename) as csvfile:
+                data = csv.reader(csvfile, delimiter=',')  # data是一个生成器
+                # 读取第一行表头
+                head = next(data)
+                try:
+                    if 'time' in head:
+                        index_x = head.index('time')
+                    if 'x' in head:
+                        index_y = head.index('x')
+                    for column in data:
+                        # 判断某一列的数据类型
+                        data_type_x = type(eval(column[index_x]))
+                        data_type_y = type(eval(column[index_y]))
 
+                        # todo：如果是list，则下面一段代码要根据需要进行调整
+                        x.append(data_type_x(column[index_x]))
+                        y.append(data_type_y(column[index_y]))
+                except UnboundLocalError:
+                    print('请检查您输入的变量名是否正确！')
+        except FileNotFoundError:
+            msg = "Sorry, the file " + filename + " does not exist."
+            print(msg)
 
-
-        x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
-        y1 = np.sin(x)
-        y2 = np.cos(x)
-
-        ax.plot(x, y1, label='曲线1')
-        ax.plot(x, y2, label='曲线2')
+        # 开始画图
+        ax.plot(x, y, label='曲线1')
 
         # label字号和颜色设置：20
         ax.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)

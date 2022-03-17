@@ -88,7 +88,7 @@ def main(scheme):
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
     print('--欢迎来到LasVSim的绘图世界！成功！')
-    main(9)
+    main(0)
 
 
 
