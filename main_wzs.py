@@ -40,12 +40,6 @@ def built_parser(scheme):
     '''file setting'''
     parser.add_argument("--filename", type=str, default='test_wzs.csv')
 
-    '''data setting'''
-    parser.add_argument("--x_data", type=str, default='time',
-                        help='You can change the name of the data whatever you need.')
-    parser.add_argument("--y_data", type=str, default='x',
-                        help='You can change the name of the data whatever you need.')
-
     '''font setting'''
     parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')
 
@@ -76,6 +70,47 @@ def built_parser(scheme):
 
     '''legend setting'''
     parser.add_argument("--legend_size", type=int, default='15')
+
+    '''data setting'''  # 通过下面这种方式可以设置每一种方案其特有的参数
+    if parser.parse_args().scheme_name[scheme] is '单变量-曲线图':
+        parser.add_argument("--x_data", type=str, default='time',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--y_data", type=str, default='x',
+                            help='You can change the name of the data whatever you need.')
+    elif parser.parse_args().scheme_name[scheme] is '单变量-散点图':
+        parser.add_argument("--x_data", type=str, default='time',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--y_data", type=str, default='x',
+                            help='You can change the name of the data whatever you need.')
+    elif parser.parse_args().scheme_name[scheme] is '单变量-直方图':
+        parser.add_argument("--x_data", type=str, default='time')
+        parser.add_argument("--y_data", type=str, default=None)
+    elif parser.parse_args().scheme_name[scheme] is '相关变量-曲线图':
+        parser.add_argument("--x_data", type=str, default='x',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--y_data", type=str, default='y',
+                            help='You can change the name of the data whatever you need.')
+    elif parser.parse_args().scheme_name[scheme] is '相关变量-散点图':
+        parser.add_argument("--x_data", type=str, default='x',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--y_data", type=str, default='y',
+                            help='You can change the name of the data whatever you need.')
+    elif parser.parse_args().scheme_name[scheme] is '双Y轴-曲线图':
+        parser.add_argument("--x_data", type=str, default='time',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--y_data", type=str, default='x',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--right_y_data", type=str, default='y',
+                            help='You can change the name of the data whatever you need.')
+    elif parser.parse_args().scheme_name[scheme] is '双Y轴-散点图':
+        parser.add_argument("--x_data", type=str, default='time',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--y_data", type=str, default='x',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--right_y_data", type=str, default='y',
+                            help='You can change the name of the data whatever you need.')
+
+
     return parser.parse_args()
 
 def main(scheme):
@@ -97,7 +132,7 @@ def main(scheme):
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
     print('--欢迎来到LasVSim的绘图世界！成功！')
-    main(0)
+    main(6)
 
 
 

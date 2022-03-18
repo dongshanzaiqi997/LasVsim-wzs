@@ -31,6 +31,7 @@ class Plotter(object):
         self.filename = args.filename
         self.x = args.x_data
         self.y = args.y_data
+        self.right_y = args.right_y_data
         self.font = args.font
         self.figsize = args.figsize
         self.dpi = args.DPI
@@ -96,9 +97,8 @@ class Plotter(object):
         else:
             return 0
 
-    # todo:上午完成通过这个函数实现数据获取接口的开发
-    #      下午完成所有函数的接口开发。
-    #      写接口
+    # todo:完成所有函数的接口开发。
+
     def single_variable_plot(self, fig, ax):
         """
         绘制单变量-曲线图
@@ -133,12 +133,13 @@ class Plotter(object):
         绘制'单变量-散点图'
         这是第2个绘图方案
         """
-        rng = np.random.RandomState(0)  # 产生伪随机数，类似numpy.random.seed()的作用
-        x = range(10)
-        y = rng.randn(10)  # 从标准正太分布中返回10个样本值
+        # 数据获取
+        x, y = self.get_data()
 
-        colors = rng.rand(10)  # 产生10个介于[0，1]之间的数值，用于颜色映射的数值
-        sizes = 700 * rng.rand(10)  # 用于改变散点面积的数值
+        # 颜色映射
+        rng = np.random.RandomState(0)  # 产生伪随机数，类似numpy.random.seed()的作用
+        colors = rng.rand(len(x))  # 产生10个介于[0，1]之间的数值，用于颜色映射的数值
+        sizes = 700 * rng.rand(len(x))  # 用于改变散点面积的数值
 
         # plt.scatter(x, y, c=colors, s=sizes, alpha=0.3, cmap='viridis')
         ax.scatter(x, y, marker='o', s=sizes, alpha=0.3, cmap='viridis', label='散点图')
@@ -159,28 +160,28 @@ class Plotter(object):
         ax.tick_params(axis='y', labelsize=self.tick_size)
 
         ax.legend(fontsize=self.leg_size, loc='best')
+        plt.tight_layout()
+        # plt.show()
 
     def single_variable_hist(self, fig, ax):
         """
         绘制’单变量-直方图’
         这是第3个绘图方案
         """
-        np.random.seed(19680801)  # 为了重现固定的随机状态
-
-        mu, sigma = 100, 15
-        x = mu + sigma * np.random.randn(10000)  # 正太分布
+        # 数据获取
+        x = self.get_data()
 
         # the histogram of the data
-        ax.hist(x, 50, density=True, alpha=0.75, label='正太分布直方图')
+        ax.hist(x, 50, density=False, alpha=0.75, label='正太分布直方图')
 
         ax.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         ax.set_ylabel(self.ylabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         ax.set_title(self.title, fontsize=self.title_size, color=self.title_color)
 
         # r是指定它后面的字符串是原始的字符串，然后用$包裹表示中间的是数学表达式，\表示转译具体的数学符号。
-        ax.text(60, .025, r'$\mu=100,\ \sigma=15$')
-        ax.set_xlim(40, 160)
-        ax.set_ylim(0, 0.03)
+        # ax.text(60, .25, r'$\mu=100,\ \sigma=15$')
+        # ax.set_xlim(40, 160)
+        # ax.set_ylim(0, 0.03)
 
         # 刻度字体和字号设置
         x_tick_label = ax.get_xticklabels()
@@ -193,16 +194,19 @@ class Plotter(object):
 
         ax.legend(fontsize=self.leg_size, loc='best')
         ax.grid(True)
+        plt.tight_layout()
+        # plt.show()
 
     def correlated_variable_plot(self, fig, ax):
         """
         绘制‘相关变量-曲线图’
         这是第4个绘图方案
         """
-        x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
-        y = np.exp(x)
+        # 数据获取
+        x, y = self.get_data()
 
-        ax.plot(x, y, label='exp(x)')
+        # 开始绘图
+        ax.plot(x, y, label='行驶轨迹')
 
         # label字号和颜色设置：20
         ax.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)
@@ -226,9 +230,13 @@ class Plotter(object):
         绘制‘相关变量-散点图’
         这是第5个绘图方案
         """
-        x = np.random.normal(0, 1, size=10000)
-        y = np.random.normal(0, 1, size=10000)
+        # x = np.random.normal(0, 1, size=10000)
+        # y = np.random.normal(0, 1, size=10000)
 
+        # 数据获取
+        x, y = self.get_data()
+
+        # 开始绘图
         ax.scatter(x, y, marker='o', alpha=0.1, label='二维正态分布的点')
 
         # 刻度字体和字号设置
@@ -250,10 +258,14 @@ class Plotter(object):
         绘制‘双Y轴-曲线图’
         这是第6个绘图方案
         """
-        x = np.arange(0.1, np.e, 0.01)
-        y1 = np.exp(-x)
-        y2 = np.log(x)
+        # x = np.arange(0.1, np.e, 0.01)
+        # y1 = np.exp(-x)
+        # y2 = np.log(x)
 
+        # 数据获取
+        x, y1, y2 = self.get_data_double_y()
+
+        # 开始绘图
         ax1 = ax
 
         ax1.set_title(self.title, fontsize=self.title_size, color=self.title_color)
@@ -280,17 +292,22 @@ class Plotter(object):
 
         lines = plot1 + plot2
         ax1.legend(lines, [l.get_label() for l in lines], fontsize=self.leg_size, loc='best')
+        plt.tight_layout()
 
     def double_y_scatter(self, fig, ax):
         """
         绘制‘双Y轴-散点图’
         这是第7个绘图方案
         """
-        N = 10
-        x = np.random.rand(N)
-        y1 = np.random.rand(N)
-        y2 = np.random.rand(N)
+        # N = 10
+        # x = np.random.rand(N)
+        # y1 = np.random.rand(N)
+        # y2 = np.random.rand(N)
 
+        # 数据获取
+        x, y1, y2 = self.get_data_double_y()
+
+        # 开始绘图
         ax1 = ax
 
         ax1.set_title(self.title, fontsize=self.title_size, color=self.title_color)
@@ -329,6 +346,7 @@ class Plotter(object):
         x1 = mu1 + sigma1 * np.random.randn(10000)  # 正太分布
         x2 = mu2 + sigma2 * np.random.randn(10000)  # 正太分布
 
+        # 开始绘图
         ax1 = ax
 
 
@@ -518,7 +536,13 @@ class Plotter(object):
         return fig
 
     def get_data(self):
-        """文件加载和获取"""
+        """
+        文件加载和数据获取，针对正常的x、y轴坐标系
+        input:
+        output:
+              x:x轴显示的数据
+              y:y轴显示的数据
+        """
         x = []
         y = []
         # todo:用切片实现中间一段数据的获取
@@ -531,21 +555,74 @@ class Plotter(object):
                 try:
                     if self.x in head:
                         index_x = head.index(self.x)
-                    if self.y in head:
-                        index_y = head.index(self.y)
+                    if self.y is None:  # 此函数中类似这种if - else结构，其作用主要是为了处理不需要y轴数据这种情况（比如，单变量-直方图）
+                        pass
+                    else:
+                        if self.y in head:
+                            index_y = head.index(self.y)
                     for column in data:
                         # 判断某一列的数据类型
                         data_type_x = type(eval(column[index_x]))
-                        data_type_y = type(eval(column[index_y]))
-
+                        if self.y is None:
+                            pass
+                        else:
+                            data_type_y = type(eval(column[index_y]))
                         # todo：如果是list，则下面一段代码要根据需要进行调整
                         x.append(data_type_x(column[index_x]))
-                        y.append(data_type_y(column[index_y]))
+                        if self.y is None:
+                            pass
+                        else:
+                            y.append(data_type_y(column[index_y]))
+                except UnboundLocalError:
+                    print('请检查您输入的变量名是否正确！')
+        except FileNotFoundError:
+            msg = "Sorry, the file " + filename + " does not exist."
+            print(msg)
+        if self.y is None:
+            return x
+        else:
+            return x, y
+
+    def get_data_double_y(self):
+        """
+        功能：文件加载和数据获取，针对双Y轴的坐标系
+        input:
+        output:
+              x:x轴显示的数据
+              y1：左边y轴显示的数据
+              y2：右边y轴显示的数据
+        """
+        x = []
+        y1 = []
+        y2 = []
+        # todo:用切片实现中间一段数据的获取
+        filename = self.filename
+        try:
+            with open(filename) as csvfile:
+                data = csv.reader(csvfile, delimiter=',')  # data是一个生成器
+                # 读取第一行表头
+                head = next(data)
+                try:
+                    if self.x in head:
+                        index_x = head.index(self.x)
+                    if self.y in head:
+                        index_left_y = head.index(self.y)
+                    if self.right_y in head:
+                        index_right_y = head.index(self.right_y)
+                    for column in data:
+                        # 判断某一列的数据类型
+                        data_type_x = type(eval(column[index_x]))
+                        data_type_left_y = type(eval(column[index_left_y]))
+                        data_type_right_y = type(eval(column[index_right_y]))
+                        # todo：如果是list，则下面一段代码要根据需要进行调整
+                        x.append(data_type_x(column[index_x]))
+                        y1.append(data_type_left_y(column[index_left_y]))
+                        y2.append(data_type_right_y(column[index_right_y]))
                 except UnboundLocalError:
                     print('请检查您输入的变量名是否正确！')
         except FileNotFoundError:
             msg = "Sorry, the file " + filename + " does not exist."
             print(msg)
 
-        return x, y
+        return x, y1, y2
 
