@@ -98,17 +98,24 @@ def built_parser(scheme):
     elif parser.parse_args().scheme_name[scheme] is '双Y轴-曲线图':
         parser.add_argument("--x_data", type=str, default='time',
                             help='You can change the name of the data whatever you need.')
-        parser.add_argument("--y_data", type=str, default='x',
+        parser.add_argument("--left_y_data", type=str, default='x',
                             help='You can change the name of the data whatever you need.')
         parser.add_argument("--right_y_data", type=str, default='y',
                             help='You can change the name of the data whatever you need.')
     elif parser.parse_args().scheme_name[scheme] is '双Y轴-散点图':
         parser.add_argument("--x_data", type=str, default='time',
                             help='You can change the name of the data whatever you need.')
-        parser.add_argument("--y_data", type=str, default='x',
+        parser.add_argument("--left_y_data", type=str, default='x',
                             help='You can change the name of the data whatever you need.')
         parser.add_argument("--right_y_data", type=str, default='y',
                             help='You can change the name of the data whatever you need.')
+    elif parser.parse_args().scheme_name[scheme] is '双Y轴-直方图':
+        parser.add_argument("--x1_data", type=str, default='time',
+                            help='You can change the name of the data whatever you need.')
+        parser.add_argument("--x2_data", type=str, default='y',
+                            help='You can change the name of the data whatever you need.')
+
+    # todo:雷达图的因为对数据存储的类型不明确,所以暂放没做.
 
 
     return parser.parse_args()
@@ -132,7 +139,7 @@ def main(scheme):
 if __name__ == '__main__':
     os.environ["OMP_NUM_THREADS"] = "1"
     print('--欢迎来到LasVSim的绘图世界！成功！')
-    main(6)
+    main(0)
 
 
 
