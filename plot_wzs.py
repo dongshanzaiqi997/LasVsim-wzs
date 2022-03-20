@@ -7,18 +7,14 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
-from datetime import datetime
-
-import pandas
 from cycler import cycler
 import csv
+import copy
 
 
 # todo:任务(1)细节参数argparse（暂放）；
-#                    （2）函数重构（暂放）；
-#                    （3）数据接口；
-#                          （a）第一步先熟悉数据格式;
-#                           (b)然后利用数据。
+#                    （2）绘图函数重构（暂放）；
+#                    （3）；
 #                    （4）；
 #                     (5)；
 #                    （6）。
@@ -27,15 +23,11 @@ class Plotter(object):
     """画图"""
     def __init__(self, args):
         super(Plotter, self).__init__()
-        self.scheme = args.scheme
-        self.filename = args.filename
         self.args = args
-
-        # self.x = args.x_data
-        # self.x2 = args.x2_data
-        # self.y = args.y_data
-        # self.right_y = args.right_y_data
-
+        self.filename = args.filename
+        self.scheme = args.drawing_scheme
+        self.data_name = args.data_name
+        self.fig_loc_param = args.figure_location_parameter
         self.font = args.font
         self.figsize = args.figsize
         self.dpi = args.DPI
@@ -61,58 +53,47 @@ class Plotter(object):
         plt.rc('axes', prop_cycle=color_cycler)  # 设置绘图区属性
 
     def plot(self):
-        """ 各种图像绘制的具体实现 """
-        if self.scheme == 0:
-            fig = self.prepare_the_canvas()
-            self.single_variable_plot(fig, ax=plt.subplot())
-        elif self.scheme == 1:
-            fig = self.prepare_the_canvas()
-            self.single_variable_scatter(fig, ax=plt.subplot())
-        elif self.scheme == 2:
-            fig = self.prepare_the_canvas()
-            self.single_variable_hist(fig, ax=plt.subplot())
-        elif self.scheme == 3:
-            fig = self.prepare_the_canvas()
-            self.correlated_variable_plot(fig, ax=plt.subplot())
-        elif self.scheme == 4:
-            fig = self.prepare_the_canvas()
-            self.correlated_variable_scatter(fig, ax=plt.subplot())
-        elif self.scheme == 5:
-            fig = self.prepare_the_canvas()
-            self.double_y_plot(fig, ax=plt.subplot())
-        elif self.scheme == 6:
-            fig = self.prepare_the_canvas()
-            self.double_y_scatter(fig, ax=plt.subplot())
-        elif self.scheme == 7:
-            fig = self.prepare_the_canvas()
-            self.double_y_hist(fig, ax=plt.subplot())
-        elif self.scheme == 8:
-            fig = self.prepare_the_canvas()
+        """ 图像绘制 """
+        # 绘图数据准备
+        init_all_the_data_for_drawing = self.prepare_all_the_data_for_drawing()
+
+        fig = self.prepare_the_canvas()
+        for i in range(len(self.scheme)):
+            scheme = self.scheme[i]
+            data = init_all_the_data_for_drawing[i][i]
+            ax = plt.subplot(self.fig_loc_param[i])
+            self.scheme_select(scheme, fig, data, ax)
+
+    def scheme_select(self, scheme, fig, data, ax):
+        """绘图方案选择"""
+        # 开始绘图
+        if scheme == 0:
+            self.single_variable_plot(fig, data, ax=ax)
+        elif scheme == 1:
+            self.single_variable_scatter(fig, data, ax=ax)
+        elif scheme == 2:
+            self.single_variable_hist(fig, data, ax=ax)
+        elif scheme == 3:
+            self.correlated_variable_plot(fig, data, ax=ax)
+        elif scheme == 4:
+            self.correlated_variable_scatter(fig, data, ax=ax)
+        elif scheme == 5:
+            self.double_y_plot(fig, data, ax=ax)
+        elif scheme == 6:
+            self.double_y_scatter(fig, data, ax=ax)
+        elif scheme == 7:
+            self.double_y_hist(fig, data, ax=ax)
+        elif scheme == 8:  # todo: 数据未定，暂时未做
             self.circle_radar(fig, ax=plt.subplot(polar=True))
-        elif self.scheme == 9:
-            fig = self.prepare_the_canvas()
+        elif scheme == 9:
             self.polygon_radar(fig, ax=plt.subplot(polar=True))
-        elif self.scheme == 10:
-            fig = self.prepare_the_canvas()
-            self.regular_multiple_subgraph_drawing(fig, ax=plt.subplot())
-        elif self.scheme == 11:
-            fig = self.prepare_the_canvas()
-            self.irregular_multiple_subgraph_drawing(fig, ax=plt.subplot())
         else:
             return 0
 
-    # todo:完成所有函数的接口开发。
-
-    def single_variable_plot(self, fig, ax):
-        """
-        绘制单变量-曲线图
-        这是第1个绘图方案
-        """
-        # 数据x、 y
-        # x, y = self.get_data()
-        x_data = self.args.x_data
-        y_data = self.args.y_data
-        x, y = self.get_data(x_data, y_data)
+    def single_variable_plot(self, fig, data, ax):
+        """单变量-曲线图绘制"""
+        # 数据准备
+        x, y = data[0], data[1]
 
         # 开始画图
         ax.plot(x, y, label='曲线1')
@@ -133,18 +114,14 @@ class Plotter(object):
         # title字号和颜色设置
         ax.set_title(self.title, fontsize=self.title_size, color=self.title_color)
         ax.legend(fontsize=self.leg_size, loc='best')
+
+        plt.tight_layout()
         # plt.show()
 
-    def single_variable_scatter(self, fig, ax):
-        """
-        绘制'单变量-散点图'
-        这是第2个绘图方案
-        """
-        # 数据获取
-        # x, y = self.get_data()
-        x_data = self.args.x_data
-        y_data = self.args.y_data
-        x, y = self.get_data(x_data, y_data)
+    def single_variable_scatter(self, fig, data, ax):
+        """单变量-散点图绘制"""
+        # 数据准备
+        x, y = data[0], data[1]
 
         # 颜色映射
         rng = np.random.RandomState(0)  # 产生伪随机数，类似numpy.random.seed()的作用
@@ -173,17 +150,10 @@ class Plotter(object):
         plt.tight_layout()
         # plt.show()
 
-    def single_variable_hist(self, fig, ax):
-        """
-        绘制’单变量-直方图’
-        这是第3个绘图方案
-        """
-        # 数据获取
-        # x = self.get_data()
-        x_data = self.args.x_data
-        y_data = self.args.y_data
-
-        x = self.get_data(x_data, y_data)
+    def single_variable_hist(self, fig, data, ax):
+        """单变量-直方图绘制"""
+        # 数据准备
+        x = data
 
         # the histogram of the data
         ax.hist(x, 50, density=False, alpha=0.75, label='正太分布直方图')
@@ -211,16 +181,10 @@ class Plotter(object):
         plt.tight_layout()
         # plt.show()
 
-    def correlated_variable_plot(self, fig, ax):
-        """
-        绘制‘相关变量-曲线图’
-        这是第4个绘图方案
-        """
-        # 数据获取
-        # x, y = self.get_data()
-        x_data = self.args.x_data
-        y_data = self.args.y_data
-        x, y = self.get_data(x_data, y_data)
+    def correlated_variable_plot(self, fig, data, ax):
+        """相关变量-曲线图"""
+        # 数据准备
+        x, y = data[0], data[1]
 
         # 开始绘图
         ax.plot(x, y, label='行驶轨迹')
@@ -242,19 +206,10 @@ class Plotter(object):
         ax.set_title(self.title, fontsize=self.title_size, color=self.title_color)
         ax.legend(fontsize=self.leg_size, loc='best')
 
-    def correlated_variable_scatter(self, fig, ax):
-        """
-        绘制‘相关变量-散点图’
-        这是第5个绘图方案
-        """
-        # x = np.random.normal(0, 1, size=10000)
-        # y = np.random.normal(0, 1, size=10000)
-
-        # 数据获取
-        # x, y = self.get_data()
-        x_data = self.args.x_data
-        y_data = self.args.y_data
-        x, y = self.get_data(x_data, y_data)
+    def correlated_variable_scatter(self, fig, data, ax):
+        """相关变量-散点图"""
+        # 数据准备
+        x, y = data[0], data[1]
 
         # 开始绘图
         ax.scatter(x, y, marker='o', alpha=0.1, label='二维正态分布的点')
@@ -273,21 +228,10 @@ class Plotter(object):
         ax.set_ylabel(self.ylabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         ax.legend(fontsize=self.leg_size, loc='best')
 
-    def double_y_plot(self, fig, ax):
-        """
-        绘制‘双Y轴-曲线图’
-        这是第6个绘图方案
-        """
-        # x = np.arange(0.1, np.e, 0.01)
-        # y1 = np.exp(-x)
-        # y2 = np.log(x)
-
-        # 数据获取
-        # x, y1, y2 = self.get_data_double_y(
-        x_data = self.args.x_data
-        left_y_data = self.args.left_y_data
-        right_y_data = self.args.right_y_data
-        x, y1, y2 = self.get_data_double_y(x_data, left_y_data, right_y_data)
+    def double_y_plot(self, fig, data, ax):
+        """双Y轴-曲线图绘制"""
+        # 数据准备
+        x, y1, y2 = data[0], data[1], data[2]
 
         # 开始绘图
         ax1 = ax
@@ -318,22 +262,10 @@ class Plotter(object):
         ax1.legend(lines, [l.get_label() for l in lines], fontsize=self.leg_size, loc='best')
         plt.tight_layout()
 
-    def double_y_scatter(self, fig, ax):
-        """
-        绘制‘双Y轴-散点图’
-        这是第7个绘图方案
-        """
-        # N = 10
-        # x = np.random.rand(N)
-        # y1 = np.random.rand(N)
-        # y2 = np.random.rand(N)
-
-        # 数据获取
-        x_data = self.args.x_data
-        left_y_data = self.args.left_y_data
-        right_y_data = self.args.right_y_data
-        x, y1, y2 = self.get_data_double_y(x_data, left_y_data, right_y_data)
-        # x, y1, y2 = self.get_data_double_y()
+    def double_y_scatter(self, fig, data, ax):
+        """双Y轴-散点图绘制"""
+        # 数据准备
+        x, y1, y2 = data[0], data[1], data[2]
 
         # 开始绘图
         ax1 = ax
@@ -364,21 +296,12 @@ class Plotter(object):
 
         ax.legend(handles=[s1, s2], fontsize=self.leg_size, loc='best')
 
-    # todo:今天下午的任务是完成剩余的函数的接口改写并进行所有函数的整理
-    def double_y_hist(self, fig, ax):  # todo:对于变量里面都是同一个数怎么画直方图 ? 因为 竖条个数Num=max-min/bins.
-        """
-        绘制‘双Y轴-直方图’
-        这是第8个绘图方案
-        """
-        # np.random.seed(19680801)  # 为了重现固定的随机状态
-        # mu1, sigma1, mu2, sigma2 = 100, 15, 120, 10
-        # x1 = mu1 + sigma1 * np.random.randn(10000)  # 正太分布
-        # x2 = mu2 + sigma2 * np.random.randn(10000)  # 正太分布
 
-        # 数据获取
-        x1_data = self.args.x1_data
-        x2_data = self.args.x2_data
-        x1, x2 = self.get_data(x1_data, x2_data)
+    # todo: 解决剩余的那个bug
+    def double_y_hist(self, fig, data, ax):  # todo:对于变量里面都是同一个数怎么画直方图 ? 因为 竖条个数Num=max-min/bins.
+        """双Y轴-直方图绘制"""
+        # 数据准备
+        x1, x2 = data[0], data[1]
 
         # 开始绘图
         ax1 = ax
@@ -393,18 +316,19 @@ class Plotter(object):
         ax2.set_ylabel(self.y2label, fontsize=self.axes_label_size, color=self.axes_label_color)
         plt.yticks(fontproperties=self.tick_font, size=self.tick_size)
 
+        # fig.get_legend().remove()
+        # fig.legend_.remove()
+        # gca().fig.legend()
         fig.legend(loc='upper right',
                    bbox_to_anchor=(1, 1),
                    bbox_transform=ax1.transAxes,
                    fontsize=self.leg_size)
         plt.tight_layout()
-        plt.show()
+        # plt.show()
+
 
     def circle_radar(self, fig, ax):
-        """
-        绘制圆形雷达图
-        这是第9个绘图方案
-        """
+        """圆形雷达图绘制"""
         results = [{"安全性": 87, "合规性": 79, "舒适性": 95, "效率性": 92, "节能性": 85},
                    {"安全性": 80, "合规性": 99, "舒适性": 81, "效率性": 85, "节能性": 61}]
 
@@ -457,10 +381,7 @@ class Plotter(object):
         plt.tight_layout()
 
     def polygon_radar(self, fig, ax):
-        """
-        绘制多边形雷达图
-        这是第10个绘图方案
-        """
+        """多边形雷达图绘制"""
         results = [{"安全性": 87, "合规性": 79, "舒适性": 95, "效率性": 92, "节能性": 85},
                    {"安全性": 80, "合规性": 90, "舒适性": 91, "效率性": 85, "节能性": 88}]
         data_length = len(results[0])
@@ -525,65 +446,44 @@ class Plotter(object):
 
         plt.tight_layout()  # ax无此方法
 
-
-    # todo:第一步先按当前思路往下推;第二步重构以实现目的.
-    def regular_multiple_subgraph_drawing(self, fig, ax):
-        """ 在同一画布上绘制规则的多幅子图 """
-        # 画第1个图：折线图
-        # x = np.arange(1, 100)
-
-        ax1 = plt.subplot(221)
-        self.double_y_hist(fig, ax1)
-
-        # 画第2个图：散点图
-        ax2 = plt.subplot(222)
-        self.single_variable_scatter(fig, ax2)
-
-        # 画第3个图：直方图
-        ax3 = plt.subplot(223)
-        self.single_variable_plot(fig, ax3)
-
-        # 画第4个图：雷达图
-        ax4 = plt.subplot(224, polar=True)
-        self.circle_radar(fig, ax4)
-        plt.tight_layout()
-
-    def irregular_multiple_subgraph_drawing(self, fig, ax):
-        """ 在同一画布上绘制不规则的多幅子图 """
-        # x = np.arange(1, 100)
-
-        # 画第1个图：直方图
-        ax1 = plt.subplot(211)
-        self.double_y_hist(fig, ax1)
-
-        # 画第2个图：散点图
-        ax2 = plt.subplot(223)
-        self.single_variable_scatter(fig, ax2)
-
-        # 画第3个图：雷达图
-        ax3 = plt.subplot(224, polar=True)
-        self.polygon_radar(fig, ax3)
-        # 第一个图占了211的位置，如果想在下面放两个图，得把第二行当成2列，剩下的两个图像将占据223和224的位置
-
-        plt.tight_layout()
-
     def prepare_the_canvas(self):
         """ 画布准备 """
         fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         return fig
 
-    def get_data(self, variable_name_1, variable_name_2):
+    def prepare_all_the_data_for_drawing(self):
         """
-        文件加载和数据获取，针对正常的x、y轴坐标系
+        功能：为绘图准备所有所有的数据
         input:
-             variable_name_1:csv第一行变量名1
-             variable_name_2:csv第一行变量名2
-        output:
-              output1:csv第一行变量名1对应的数据
-              output2:csv第一行变量名2对应的数据
+        output: 输出所有绘图所需的数据
         """
-        output1 = []
-        output2 = []
+        # 数据x、 y
+        data_name = self.data_name
+        mid_variable_for_per_subplot = []
+        output_all_the_data_for_plot = []
+        for i in range(len(data_name)):
+            for j in range(len(data_name[i])):
+                per_data_name = data_name[i][j]
+                mid_variable_for_per_subplot.append(self.get_data_for_per_variable(per_data_name))
+            copy_data_for_return = copy.deepcopy(dict(zip([i], [mid_variable_for_per_subplot])))
+
+            # 为了构建对应data_name的变量字典而清空列表
+            del mid_variable_for_per_subplot[:]
+
+            # 为了返回数据而存储数据
+            output_all_the_data_for_plot.append(copy_data_for_return)
+
+        return output_all_the_data_for_plot
+
+    def get_data_for_per_variable(self, variable_name):
+        """
+        文件加载和指定数据获取
+        input:
+             variable_name: csv第一行变量名
+        output:
+              output1: variable_name对应的数据
+        """
+        output = []
         # todo:用切片实现中间一段数据的获取
         filename = self.filename
         try:
@@ -592,78 +492,18 @@ class Plotter(object):
                 # 读取第一行表头
                 head = next(data)
                 try:
-                    if variable_name_1 in head:
-                        index_x = head.index(variable_name_1)
-                    if variable_name_2 is None:  # 此函数中类似这种if - else结构，其作用主要是为了处理不需要y轴数据这种情况（比如，单变量-直方图）
-                        pass
-                    else:
-                        if variable_name_2 in head:
-                            index_y = head.index(variable_name_2)
+                    if variable_name in head:
+                        index_x = head.index(variable_name)
                     for column in data:
                         # 判断某一列的数据类型
                         data_type_x = type(eval(column[index_x]))
-                        if variable_name_2 is None:
-                            pass
-                        else:
-                            data_type_y = type(eval(column[index_y]))
                         # todo：如果是list，则下面一段代码要根据需要进行调整
-                        output1.append(data_type_x(column[index_x]))
-                        if variable_name_2 is None:
-                            pass
-                        else:
-                            output2.append(data_type_y(column[index_y]))
-                except UnboundLocalError:
-                    print('请检查您输入的变量名是否正确！')
-        except FileNotFoundError:
-            msg = "Sorry, the file " + filename + " does not exist."
-            print(msg)
-        if variable_name_2 is None:
-            return output1
-        else:
-            return output1, output2
-
-    def get_data_double_y(self, variable_name_1, variable_name_2, variable_name_3):
-        """
-         文件加载和数据获取，针对正常的x、y轴坐标系
-         input:
-              variable_name_1:csv第一行变量名1
-              variable_name_2:csv第一行变量名2
-              variable_name_3:csv第一行变量名3
-         output:
-               output1:csv第一行变量名1对应的数据
-               output2:csv第一行变量名2对应的数据
-               output3:csv第一行变量名3对应的数据
-         """
-        output1 = []
-        output2 = []
-        output3 = []
-        # todo:用切片实现中间一段数据的获取
-        filename = self.filename
-        try:
-            with open(filename) as csvfile:
-                data = csv.reader(csvfile, delimiter=',')  # data是一个生成器
-                # 读取第一行表头
-                head = next(data)
-                try:
-                    if variable_name_1 in head:
-                        index_1 = head.index(variable_name_1)
-                    if variable_name_2 in head:
-                        index_2 = head.index(variable_name_2)
-                    if variable_name_3 in head:
-                        index_3 = head.index(variable_name_3)
-                    for column in data:
-                        # 判断某一列的数据类型
-                        data_type_x = type(eval(column[index_1]))
-                        data_type_left_y = type(eval(column[index_2]))
-                        data_type_right_y = type(eval(column[index_3]))
-                        # todo：如果是list，则下面一段代码要根据需要进行调整
-                        output1.append(data_type_x(column[index_1]))
-                        output2.append(data_type_left_y(column[index_2]))
-                        output3.append(data_type_right_y(column[index_3]))
+                        output.append(data_type_x(column[index_x]))
                 except UnboundLocalError:
                     print('请检查您输入的变量名是否正确！')
         except FileNotFoundError:
             msg = "Sorry, the file " + filename + " does not exist."
             print(msg)
 
-        return output1, output2, output3
+        return output
+
