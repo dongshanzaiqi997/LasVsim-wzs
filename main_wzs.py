@@ -36,10 +36,9 @@ def built_parser():
     parser.add_argument("--filename", type=str, default='test_wzs.csv')
 
     '''drawing setting'''
-    parser.add_argument("--drawing_scheme", type=list, default=[7, 0])
-    parser.add_argument("--data_name", type=dict, default={0: ['time', 'y'], 1: ['time', 'x']})
+    parser.add_argument("--drawing_scheme", type=list, default=[0, 7])
+    parser.add_argument("--data_name", type=dict, default={0: ['time', 'x'], 1: ['time', 'y']})
     parser.add_argument("--figure_location_parameter", type=list, default=[211, 212])
-
 
     '''font setting'''
     parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')

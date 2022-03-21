@@ -45,3 +45,14 @@
 # ########################## 打印matplotlib参数配置文件地址的语句 #################################
 # print(matplotlib.matplotlib_fname())
 
+
+# ########################## 合并图例 #################################
+# 合并图例
+# lns1 = ax.plot(time, Swdown, '-', label='Swdown')
+# lns2 = ax.plot(time, Rn, '-', label='Rn')
+# ax2 = ax.twinx()
+# lns3 = ax2.plot(time, temp, '-r', label='temp')
+# lns = lns1 + lns2 + lns3
+# labs = [l.get_label() for l in lns]
+# ax.legend(lns, labs, loc=0)
+

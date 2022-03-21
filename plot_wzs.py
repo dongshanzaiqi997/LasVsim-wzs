@@ -11,6 +11,9 @@ from cycler import cycler
 import csv
 import copy
 
+# from matplotlib.legend_handler import HandlerTuple
+# from pylab import *
+
 
 # todo:任务(1)细节参数argparse（暂放）；
 #                    （2）绘图函数重构（暂放）；
@@ -296,8 +299,6 @@ class Plotter(object):
 
         ax.legend(handles=[s1, s2], fontsize=self.leg_size, loc='best')
 
-
-    # todo: 解决剩余的那个bug
     def double_y_hist(self, fig, data, ax):  # todo:对于变量里面都是同一个数怎么画直方图 ? 因为 竖条个数Num=max-min/bins.
         """双Y轴-直方图绘制"""
         # 数据准备
@@ -306,26 +307,23 @@ class Plotter(object):
         # 开始绘图
         ax1 = ax
         plt.title(self.title, fontsize=self.title_size, color=self.title_color)
-        ax1.hist(x1, 50, density=False, alpha=0.75, label='直方图1')
+        plt.hist(x1, 50, density=False, alpha=0.75, label='直方图1')
         ax1.set_xlabel(self.xlabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         ax1.set_ylabel(self.ylabel, fontsize=self.axes_label_size, color=self.axes_label_color)
         plt.xticks(fontproperties=self.tick_font, size=self.tick_size)
         plt.yticks(fontproperties=self.tick_font, size=self.tick_size)
         ax2 = ax1.twinx()
-        ax2.hist(x2, 50, density=False, alpha=0.75, color='fuchsia', label='直方图2')
+        plt.hist(x2, 50, density=False, alpha=0.75, color='fuchsia', label='直方图2')
         ax2.set_ylabel(self.y2label, fontsize=self.axes_label_size, color=self.axes_label_color)
         plt.yticks(fontproperties=self.tick_font, size=self.tick_size)
 
-        # fig.get_legend().remove()
-        # fig.legend_.remove()
-        # gca().fig.legend()
-        fig.legend(loc='upper right',
-                   bbox_to_anchor=(1, 1),
-                   bbox_transform=ax1.transAxes,
-                   fontsize=self.leg_size)
+        # todo：暂放图例设置
+        # todo:要么从更宏大的方面入手来解决问题，比如更换直方图函数，更改外层更大的实现架构。要么沿着当前操作方法往深层挖掘。
+        ax1.legend(fontsize=self.leg_size, loc=2)
+        ax2.legend(fontsize=self.leg_size, loc=1)
+
         plt.tight_layout()
         # plt.show()
-
 
     def circle_radar(self, fig, ax):
         """圆形雷达图绘制"""
