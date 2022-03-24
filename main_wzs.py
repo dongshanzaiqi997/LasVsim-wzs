@@ -36,9 +36,23 @@ def built_parser():
     parser.add_argument("--filename", type=str, default='test_wzs.csv')
 
     '''drawing setting'''
-    parser.add_argument("--drawing_scheme", type=list, default=[0, 7])
-    parser.add_argument("--data_name", type=dict, default={0: ['time', 'x'], 1: ['time', 'y']})
-    parser.add_argument("--figure_location_parameter", type=list, default=[211, 212])
+    parser.add_argument("--drawing_scheme", type=list, default=[0])
+    parser.add_argument("--data_name", type=dict, default={0: ['time', 'x']})
+    parser.add_argument("--figure_location_parameter", type=list, default=[111])
+    parser.add_argument("--title", type=list, default=['标题'])
+    parser.add_argument("--axes_label", type=dict, default={0: ['x', 'y1']})
+    parser.add_argument("--legend_label", type=dict, default={0: ['位置x坐标的变化']})
+
+    # parser.add_argument("--drawing_scheme", type=list, default=[7, 3, 5])
+    # parser.add_argument("--data_name", type=dict, default={0: ['time', 'y'], 1: ['x', 'y'], 2: ['time', 'x', 'y']})
+    # parser.add_argument("--figure_location_parameter", type=list, default=[221, 222, 212])
+    # parser.add_argument("--title", type=list, default=['标题1', '标题2', '标题3'])
+    # parser.add_argument("--axes_label", type=dict, default={0: ['x', 'y1', 'y2'],
+    #                                                         1: ['x', 'y'],
+    #                                                         2: ['x', 'y1', 'y2']})
+    # parser.add_argument("--legend_label", type=dict, default={0: ['直方图1', '直方图2'],
+    #                                                           1: ['行驶轨迹'],
+    #                                                           2: ['位置x坐标的变化', '位置y坐标的变化']})
 
     '''font setting'''
     parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')
@@ -51,11 +65,6 @@ def built_parser():
 
     '''graph setting'''
     parser.add_argument("--graph_color", type=list, default=['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w'])
-
-    '''axes label setting'''
-    parser.add_argument("--xlabel", type=str, default='输入数据 x')
-    parser.add_argument("--ylabel", type=str, default='输出数据 y')
-    parser.add_argument("--y2label", type=str, default='输出数据 y', help='双Y轴右边的y轴标签')
     parser.add_argument("--axes_label_size", type=int, default=20)
     parser.add_argument("--axes_label_color", type=str, default='black')
 
@@ -64,7 +73,6 @@ def built_parser():
     parser.add_argument("--tick_size", type=int, default=15)
 
     '''title setting'''
-    parser.add_argument("--title", type=str, default='图像标题')
     parser.add_argument("--title_size", type=int, default=25)
     parser.add_argument("--title_color", type=str, default='black')
 
