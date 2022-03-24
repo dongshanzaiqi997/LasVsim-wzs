@@ -10,9 +10,10 @@ import matplotlib
 from cycler import cycler
 import csv
 import copy
+from datetime import datetime
 
 # todo:任务(1)绘图函数重构（暂放）；
-#                    （2）细节参数argparse。图例标签、坐标轴标签、标题和size缩放。（今天上午完成）
+#                    （2）细节参数argparse。图例标签、坐标轴标签、标题和size缩放。（完成）
 #                    （3）默认生成所有状态和动作图像并保存（有待商榷）；（今天下午完成）
 #                    （4）列表还是下拉（有待商榷）；（今天晚上完成）
 #                     (5)ppt展示；（明天上午完成）
@@ -40,6 +41,8 @@ class Plotter(object):
         self.title_size = args.title_size
         self.title_color = args.title_color
         self.leg_size = args.legend_size
+        self.default_variables = args.default_variables
+        self.default_units = args.default_units_of_the_default_variables
 
         # 字体及正负号显示设置
         matplotlib.rcParams['font.sans-serif'] = self.font
@@ -559,4 +562,34 @@ class Plotter(object):
             print(msg)
 
         return output
+
+    def default_variables_drawing(self):
+        """默认变量的图像绘制"""
+        t = self.get_data_for_per_variable('time')
+
+        for i, j in zip(self.default_variables, self.default_units):
+            variable_name = i
+
+            # 数据准备
+            output = self.get_data_for_per_variable(variable_name)
+            data = [t, output]
+
+            fig = self.prepare_the_canvas()
+            ax = plt.subplot(111)
+            title = i
+            axes_label = ['t' + '(ms)', i + '(' + j + ')']
+            legend_label = [i + '随时间的变化趋势']
+            self.single_variable_plot(fig, data, title, axes_label, legend_label, ax)
+
+            # 图像保存
+            figure_dir = './Figures'
+            os.makedirs(figure_dir, exist_ok=True)
+            log_dir = './Figures/' + datetime.now().strftime('%Y-%m-%d-%H')
+            os.makedirs(log_dir, exist_ok=True)
+
+            plt.savefig(fname=log_dir + '/' + i + '.jpg')
+            plt.savefig(fname=log_dir + '/' + i + '.pdf')
+            plt.savefig(fname=log_dir + '/' + i + '.svg')
+
+
 

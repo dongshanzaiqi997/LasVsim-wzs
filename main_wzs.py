@@ -29,6 +29,7 @@ SCHEME_NAME = {0: '单变量-曲线图',
                8: '圆形雷达图',
                9: '多边形雷达图'}
 
+
 def built_parser():
     parser = argparse.ArgumentParser()
 
@@ -79,12 +80,20 @@ def built_parser():
     '''legend setting'''
     parser.add_argument("--legend_size", type=int, default='15')
 
+    '''default variables drawing setting'''
+    parser.add_argument("--default_variables", type=list,
+                        default=['x', 'y', 'phi', 'u', 'v', 'w', 'acc_lon', 'acc_lat', 'eng_speed',
+                                 'fuel_total', 'fuel_rate', 'acce_des', 'theta_des'])
+    parser.add_argument("--default_units_of_the_default_variables", type=list,
+                        default=['m', ' m', 'rad', 'm/s', 'm/s','rad/s','m/s^2','m/s^2','rpm','L','g/s','m/s^2','rad'])
+
     return parser.parse_args()
 
 def main():
     """图像绘制入口"""
     args = built_parser()
     draw = Plotter(args)
+    draw.default_variables_drawing()
     draw.plot()
 
     # 图像保存
