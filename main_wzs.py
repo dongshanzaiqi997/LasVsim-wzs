@@ -14,9 +14,6 @@ from __future__ import print_function
 import argparse
 import os
 from plot_wzs import Plotter
-import plot_config
-from datetime import datetime
-import matplotlib.pyplot as plt
 
 SCHEME_NAME = {0: '单变量-曲线图',
                1: '单变量-散点图',
@@ -29,6 +26,8 @@ SCHEME_NAME = {0: '单变量-曲线图',
                8: '圆形雷达图',
                9: '多边形雷达图'}
 
+DRAWING_TEMPLATE = '单幅图像'  # '单幅图像'、'规则型多子图' or 'None'
+
 
 def built_parser():
     parser = argparse.ArgumentParser()
@@ -37,23 +36,49 @@ def built_parser():
     parser.add_argument("--filename", type=str, default='test_wzs.csv')
 
     '''drawing setting'''
-    parser.add_argument("--drawing_scheme", type=list, default=[0])
-    parser.add_argument("--data_name", type=dict, default={0: ['time', 'x']})
-    parser.add_argument("--figure_location_parameter", type=list, default=[111])
-    parser.add_argument("--title", type=list, default=['标题'])
-    parser.add_argument("--axes_label", type=dict, default={0: ['x', 'y1']})
-    parser.add_argument("--legend_label", type=dict, default={0: ['位置x坐标的变化']})
+    if DRAWING_TEMPLATE is '单幅图像':
+        parser.add_argument("--drawing_scheme", type=list, default=[2])
+        parser.add_argument("--data_name", type=dict, default={0: ['acce_des']})
+        parser.add_argument("--figure_location_parameter", type=list, default=[111])
+        parser.add_argument("--title", type=list, default=['单变量-直方图'])
+        parser.add_argument("--axes_label", type=dict, default={0: ['acce_des(m/s^2)', '频数']})
+        parser.add_argument("--legend_label", type=dict, default={0: ['期望纵向加速度直方图']})
 
-    # parser.add_argument("--drawing_scheme", type=list, default=[7, 3, 5])
-    # parser.add_argument("--data_name", type=dict, default={0: ['time', 'y'], 1: ['x', 'y'], 2: ['time', 'x', 'y']})
-    # parser.add_argument("--figure_location_parameter", type=list, default=[221, 222, 212])
-    # parser.add_argument("--title", type=list, default=['标题1', '标题2', '标题3'])
-    # parser.add_argument("--axes_label", type=dict, default={0: ['x', 'y1', 'y2'],
-    #                                                         1: ['x', 'y'],
-    #                                                         2: ['x', 'y1', 'y2']})
-    # parser.add_argument("--legend_label", type=dict, default={0: ['直方图1', '直方图2'],
-    #                                                           1: ['行驶轨迹'],
-    #                                                           2: ['位置x坐标的变化', '位置y坐标的变化']})
+        # 单幅图像
+        # parser.add_argument("--drawing_scheme", type=list, default=[7])
+        # parser.add_argument("--data_name", type=dict, default={0: ['u', 'acce_des']})
+        # parser.add_argument("--figure_location_parameter", type=list, default=[111])
+        # parser.add_argument("--title", type=list, default=['双Y轴-直方图'])
+        # parser.add_argument("--axes_label", type=dict, default={0: ['u(m/s)或acce_des(m/s^2)', '频数', '频数']})
+        # parser.add_argument("--legend_label", type=dict, default={0: ['纵向速度直方图', '期望纵向加速度直方图']})
+
+    elif DRAWING_TEMPLATE is '规则型多子图':
+        # 规则型多子图
+        parser.add_argument("--drawing_scheme", type=list, default=[0, 0, 0, 0])
+        parser.add_argument("--data_name", type=dict, default={0: ['time', 'x'], 1: ['time', 'y'], 2: ['time', 'phi'],
+                                                               3: ['time', 'u']})
+        parser.add_argument("--figure_location_parameter", type=list, default=[221, 222, 223, 224])
+        parser.add_argument("--title", type=list, default=['x随时间变化图', 'y随时间变化图', 'phi随时间变化图', 'u随时间变化图'])
+        parser.add_argument("--axes_label", type=dict, default={0: ['t(ms)', 'x(m)'],
+                                                                1: ['t(ms)', 'y(m)'],
+                                                                2: ['t(ms)', 'phi(rad)'],
+                                                                3: ['t(ms)', 'u(m/s)']})
+        parser.add_argument("--legend_label", type=dict, default={0: ['位置x坐标的变化'],
+                                                                  1: ['位置y坐标的变化'],
+                                                                  2: ['横摆角phi随时间变化'],
+                                                                  3: ['纵向速度u随时间变化']})
+    else:
+        # 不规则型多子图
+        parser.add_argument("--drawing_scheme", type=list, default=[7, 3, 5])
+        parser.add_argument("--data_name",type=dict, default={0: ['u', 'acce_des'], 1: ['x', 'y'], 2: ['time', 'x', 'y']})
+        parser.add_argument("--figure_location_parameter", type=list, default=[212, 222, 221])
+        parser.add_argument("--title", type=list, default=['双Y轴-直方图', '相关变量-曲线图', '双Y轴-曲线图'])
+        parser.add_argument("--axes_label", type=dict, default={0: ['u(m/s)或acce_des(m/s^2)', '频数', '频数'],
+                                                                1: ['x(m)', 'y(m)'],
+                                                                2: ['t(ms)', 'x(m)', 'y(m)']})
+        parser.add_argument("--legend_label", type=dict, default={0: ['纵向速度u随时间变化', '期望纵向加速度acce_des随时间变化'],
+                                                                  1: ['行驶轨迹'],
+                                                                  2: ['位置x坐标的变化', '位置y坐标的变化']})
 
     '''font setting'''
     parser.add_argument("--font", type=str, default='SimSun', help='SimSun or Times New Roman')
@@ -95,15 +120,7 @@ def main():
     draw = Plotter(args)
     draw.default_variables_drawing()
     draw.plot()
-
-    # 图像保存
-    figure_dir = './Figures'
-    os.makedirs(figure_dir, exist_ok=True)
-    log_dir = './Figures/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    os.makedirs(log_dir, exist_ok=True)
-    plt.savefig(fname=log_dir + '/polygon_radar.jpg')
-    plt.savefig(fname=log_dir + '/polygon_radar.pdf')
-    plt.savefig(fname=log_dir + '/polygon_radar.svg')
+    draw.saving_figure()
 
 
 if __name__ == '__main__':

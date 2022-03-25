@@ -14,10 +14,10 @@ from datetime import datetime
 
 # todo:任务(1)绘图函数重构（暂放）；
 #                    （2）细节参数argparse。图例标签、坐标轴标签、标题和size缩放。（完成）
-#                    （3）默认生成所有状态和动作图像并保存（有待商榷）；（今天下午完成）
-#                    （4）列表还是下拉（有待商榷）；（今天晚上完成）
-#                     (5)ppt展示；（明天上午完成）
-#                    （6）ppt完善。（明天下午完成）
+#                    （3）默认生成所有状态和动作图像并保存（有待商榷）；（完成）
+#                    （4）列表还是下拉（有待商榷）；（任务已取消）
+#                     (5)ppt展示；（完成）
+#                    （6）ppt完善。（完成）
 
 class Plotter(object):
     """画图"""
@@ -151,7 +151,7 @@ class Plotter(object):
         # 颜色映射
         rng = np.random.RandomState(0)  # 产生伪随机数，类似numpy.random.seed()的作用
         colors = rng.rand(len(x))  # 产生10个介于[0，1]之间的数值，用于颜色映射的数值
-        sizes = 700 * rng.rand(len(x))  # 用于改变散点面积的数值
+        sizes = 100 * rng.rand(len(x))  # 用于改变散点面积的数值
 
         # plt.scatter(x, y, c=colors, s=sizes, alpha=0.3, cmap='viridis')
         ax.scatter(x, y, marker='o', s=sizes, alpha=0.3, cmap='viridis', label=legend_label)
@@ -591,5 +591,14 @@ class Plotter(object):
             plt.savefig(fname=log_dir + '/' + i + '.pdf')
             plt.savefig(fname=log_dir + '/' + i + '.svg')
 
+    def saving_figure(self):
+        """图像保存"""
 
+        figure_dir = './Figures'
+        os.makedirs(figure_dir, exist_ok=True)
+        log_dir = './Figures/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        os.makedirs(log_dir, exist_ok=True)
+        plt.savefig(fname=log_dir + '/figure.jpg')
+        plt.savefig(fname=log_dir + '/figure.pdf')
+        plt.savefig(fname=log_dir + '/figure.svg')
 
